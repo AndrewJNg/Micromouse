@@ -25,13 +25,25 @@ target_Y = [7,8]
 curr_dir = 0  
 target_dir = 0
 grid_layout = [[[300, 0, 0] for y in range(API.mazeHeight()+1)] for x in range(API.mazeWidth()+1)]
-#[number , top_wall, right_wall]
+#[number]
+grid_wall = [[[0, 0] for y in range(API.mazeHeight()+1)] for x in range(API.mazeWidth()+1)]
+#[top_wall,right_wall]
+grid_known_cell = [[[0] for y in range(API.mazeHeight()+1)] for x in range(API.mazeWidth()+1)]
+#[known-cell (0-new cell, 1-old cell,-1-dead end cell)]
 
 def update_mms():
     global grid_layout
     for x in range(API.mazeWidth()):
         for y in range(API.mazeHeight()):
             API.setText(x, y, grid_layout[x][y][0])
+            
+            if grid_known_cell[x][y] == 0:
+                pass
+            elif grid_known_cell[x][y] == 1:
+                API.setColor(x,y,"G")
+            elif grid_known_cell[x][y] == -1:
+                API.setColor(x,y,"A")
+
 
     
 
@@ -48,46 +60,30 @@ def flood_fill(target_X,target_Y):
             API.setColor(x, y, "R")
             grid_layout[x][y][0] = 0
     
-    for value in range(100):
+    global max_value
+    value_flag =1
+    value = 0
+    while value_flag ==1:
+        value_flag = 0
         for x in range(API.mazeWidth()):
             for y in range(API.mazeHeight()):
-                if grid_layout[x][y][0]==value:
-                    """
-                    if x < API.mazeWidth()-1 and grid_layout[x+1][y][0] > value:
+                if grid_layout[x][y][0]==value:  
+                    if x < API.mazeWidth()-1 and grid_wall[x][y][1]==0 and grid_layout[x+1][y][0] > value:
                         grid_layout[x+1][y][0]=value+1 # looking to the right
-                            
-                    if y < API.mazeHeight()-1 and grid_layout[x][y+1][0] > value:
+                        value_flag = 1
+                    if y < API.mazeHeight()-1 and grid_wall[x][y][0]==0 and grid_layout[x][y+1][0] > value:
                         grid_layout[x][y+1][0]=value+1 # looking to the top
-
-                    if x > 0 and grid_layout[x-1][y][0] > value:  
+                        value_flag = 1
+                    if x > 0 and grid_wall[x-1][y][1]==0 and grid_layout[x-1][y][0] > value:  
                         grid_layout[x-1][y][0]=value+1 # looking to the left
-                    
-                    if y > 0 and grid_layout[x][y-1][0] > value:  
+                        value_flag = 1
+                    if y > 0 and grid_wall[x][y-1][0]==0 and grid_layout[x][y-1][0] > value: 
                         grid_layout[x][y-1][0]=value+1 # looking to the bottom
-                    """
-                    if x < API.mazeWidth()-1 :
-                        if grid_layout[x][y][2]==1:
-                            pass
-                        elif grid_layout[x+1][y][0] > value:
-                            grid_layout[x+1][y][0]=value+1 # looking to the right
-                            
-                    if y < API.mazeHeight()-1:
-                        if grid_layout[x][y][1]==1:
-                            pass
-                        elif grid_layout[x][y+1][0] > value:
-                            grid_layout[x][y+1][0]=value+1 # looking to the top
-                        
-                    if x > 0 :  
-                        if grid_layout[x-1][y][2]==1:
-                            pass
-                        elif grid_layout[x-1][y][0] > value: 
-                            grid_layout[x-1][y][0]=value+1 # looking to the left
-                    if y > 0 :  
-                        if grid_layout[x][y-1][1]==1:
-                            pass
-                        elif grid_layout[x][y-1][0] > value: 
-                            grid_layout[x][y-1][0]=value+1 # looking to the bottom
-                        
+                        value_flag = 1
+
+        value = value+1                  
+    max_value = value
+
 def dir2cardinal(dir):
     if dir == -1:
         dir = 3
@@ -113,14 +109,20 @@ def decide_path():
 
     
     # select best path
+    
+    current = grid_layout[curr_X_coor][curr_Y_coor][0]
+    top = grid_layout[curr_X_coor][curr_Y_coor+1][0]
+    left = grid_layout[curr_X_coor-1][curr_Y_coor][0]
+    right = grid_layout[curr_X_coor+1][curr_Y_coor][0]
+    bottom = grid_layout[curr_X_coor][curr_Y_coor-1][0]
 
-    if  grid_layout[curr_X_coor][curr_Y_coor+1][0] < grid_layout[curr_X_coor][curr_Y_coor][0] and grid_layout[curr_X_coor][curr_Y_coor][1] == 0:
+    if  top  < current and grid_wall[curr_X_coor][curr_Y_coor][0] == 0:
         move(0)
-    elif grid_layout[curr_X_coor+1][curr_Y_coor][0] < grid_layout[curr_X_coor][curr_Y_coor][0] and grid_layout[curr_X_coor][curr_Y_coor][2] == 0:
+    elif right < current and grid_wall[curr_X_coor][curr_Y_coor][1] == 0:
         move(1)
-    elif grid_layout[curr_X_coor][curr_Y_coor-1][0] < grid_layout[curr_X_coor][curr_Y_coor][0] and grid_layout[curr_X_coor][curr_Y_coor-1][1] == 0:
+    elif bottom < current and grid_wall[curr_X_coor][curr_Y_coor-1][0] == 0:
         move(2)
-    elif grid_layout[curr_X_coor-1][curr_Y_coor][0] < grid_layout[curr_X_coor][curr_Y_coor][0] and grid_layout[curr_X_coor-1][curr_Y_coor][2] == 0:
+    elif left < current and grid_wall[curr_X_coor-1][curr_Y_coor][1] == 0:
         move(3)
     else:
         log("help")   
@@ -142,13 +144,13 @@ def scan():
 def setWall(x,y,D):
     API.setWall(x,y,D)
     if D == "n":
-        grid_layout[x][y][1] = 1
+        grid_wall[x][y][0] = 1
     if D == "s":
-        grid_layout[x][y-1][1] = 1
+        grid_wall[x][y-1][0] = 1
     if D == "w":
-        grid_layout[x-1][y][2] = 1
+        grid_wall[x-1][y][1] = 1
     if D == "e":
-        grid_layout[x][y][2] = 1
+        grid_wall[x][y][1] = 1
 
     
 def move(dir):
@@ -156,21 +158,11 @@ def move(dir):
     global target_dir
     global curr_X_coor
     global curr_Y_coor
+
     target_dir =dir
     turn_value = target_dir-curr_dir 
     curr_dir = target_dir
     
-    # update our coordinate system
-    if curr_dir == 0 :
-            curr_Y_coor = curr_Y_coor + 1 
-    elif curr_dir == 1 :
-            curr_X_coor = curr_X_coor + 1 
-    elif curr_dir == 2 :
-            curr_Y_coor = curr_Y_coor - 1 
-    elif curr_dir == 3 :
-            curr_X_coor = curr_X_coor - 1 
-
-
     # make the necessary moves to turn in the correct direction
     if turn_value == 0:
         API.moveForward()
@@ -187,14 +179,71 @@ def move(dir):
     elif turn_value == 3 or turn_value == -1:
         API.turnLeft()
         API.moveForward()
+
+    
+    # update our coordinate system
+    if curr_dir == 0 :
+            curr_Y_coor = curr_Y_coor + 1 
+    elif curr_dir == 1 :
+            curr_X_coor = curr_X_coor + 1 
+    elif curr_dir == 2 :
+            curr_Y_coor = curr_Y_coor - 1 
+    elif curr_dir == 3 :
+            curr_X_coor = curr_X_coor - 1
+    
+    grid_known_cell[curr_X_coor][curr_Y_coor] = 1
     
 
 
 def sample_map_setup():
     for i in range(2,16):
         setWall(1,i,"e")
+    #grid_known_cell[4][5] = 1
 
+def mark_deadend():
     
+    for x in range(API.mazeWidth()):
+        for y in range(API.mazeHeight()):
+            wall_mark = 0
+            if x ==0 and y ==0:
+                grid_known_cell[0][0] = 1
+            else:
+                if grid_wall[x][y][0] ==1 : wall_mark+=1
+                if grid_wall[x][y][1] ==1 : wall_mark+=1
+                if grid_wall[x][y-1][0] ==1 : wall_mark+=1
+                if grid_wall[x-1][y][1] ==1 : wall_mark+=1
+
+                if wall_mark >=3: # or grid_layout[x][y] == max_value
+                    grid_known_cell[x][y] = -1
+                    grid_wall[x][y][0] =1
+                    grid_wall[x][y][1] =1
+                    grid_wall[x][y-1][0]=1
+                    grid_wall[x-1][y][1]=1
+
+    for x in range(API.mazeWidth(),0,-1):
+        for y in range(API.mazeHeight(),0,-1):
+            wall_mark = 0
+            if x ==0 and y ==0:
+                grid_known_cell[0][0] = 1
+            else:
+                if grid_wall[x][y][0] ==1 : wall_mark+=1
+                if grid_wall[x][y][1] ==1 : wall_mark+=1
+                if grid_wall[x][y-1][0] ==1 : wall_mark+=1
+                if grid_wall[x-1][y][1] ==1 : wall_mark+=1
+
+                if wall_mark >=3: # or grid_layout[x][y] == max_value
+                    grid_known_cell[x][y] = -1
+                    grid_wall[x][y][0] =1
+                    grid_wall[x][y][1] =1
+                    grid_wall[x][y-1][0]=1
+                    grid_wall[x-1][y][1]=1
+def path_check():
+    pass
+        
+
+        
+
+
 
 def loop():
     global curr_X_coor
@@ -202,65 +251,49 @@ def loop():
     global curr_dir
     global start_square_value
     
+    # first search
     while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
         scan()
         flood_fill(target_X,target_Y)
         update_mms()
         decide_path()
-    
-    log("goal")
+        
+    log("Goal")
     flood_fill([0],[0])
+    #mark_deadend() 
     update_mms()
-         
+    
+    # exit search
     while grid_layout[curr_X_coor][curr_Y_coor][0] != 1 :
         scan()
         flood_fill([0],[0])
         update_mms()
         decide_path()
-
+    
+    # search for better path
     log("searching for better path")
     flood_fill(target_X,target_Y)
+    #mark_deadend()
     update_mms()
-    """
-    while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
-        scan()
-        flood_fill(target_X,target_Y)
-        update_mms()
-        decide_path()
-        
-    log("time")
-    flood_fill([0],[0])
-    update_mms()
-           
-    while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
-        scan()
-        flood_fill([0],[0])
-        update_mms()
-        decide_path()
-    log("back at start")
 
+    #path_check()
     while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
         scan()
         flood_fill(target_X,target_Y)
         update_mms()
         decide_path()
-        
-    log("time")
-    flood_fill([0],[0])
-    update_mms()
-           
     while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
         scan()
         flood_fill([0],[0])
         update_mms()
         decide_path()
-    log("back at start")
-    
-    flood_fill(target_X,target_Y)
-    update_mms()
     
     
+
+    #speed run
+    log("speed run")
     while True:
+        mark_deadend()
         flood_fill(target_X,target_Y)
         update_mms()
         while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
@@ -269,11 +302,14 @@ def loop():
         flood_fill([0],[0])
         update_mms()
         while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
+            scan()
+            flood_fill([0],[0])
+            update_mms()
             decide_path()
-    """  
-    while True:
-        pass
-
+            
+        update_mms()
+  
+    
 
 
 
