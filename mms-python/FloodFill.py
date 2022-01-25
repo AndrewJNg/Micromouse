@@ -48,7 +48,7 @@ def flood_fill(target_X,target_Y):
             API.setColor(x, y, "R")
             grid_layout[x][y][0] = 0
     
-    for value in range(40):
+    for value in range(100):
         for x in range(API.mazeWidth()):
             for y in range(API.mazeHeight()):
                 if grid_layout[x][y][0]==value:
@@ -175,29 +175,19 @@ def move(dir):
     if turn_value == 0:
         API.moveForward()
         
-    elif turn_value == 1:
+    elif turn_value == 1 or turn_value == -3:
         API.turnRight()
         API.moveForward()
         
-    elif turn_value == 2:
+    elif turn_value == 2 or turn_value == -2:
         API.turnLeft()
         API.turnLeft()
         API.moveForward()
          
-    elif turn_value == 3:
+    elif turn_value == 3 or turn_value == -1:
         API.turnLeft()
         API.moveForward()
     
-    elif turn_value == -1:
-        API.turnLeft()
-        API.moveForward()
-    elif turn_value == -2:
-        API.turnLeft()
-        API.turnLeft()
-        API.moveForward()
-    elif turn_value == -3:
-        API.turnRight()
-        API.moveForward()
 
 
 def sample_map_setup():
@@ -221,6 +211,26 @@ def loop():
     log("goal")
     flood_fill([0],[0])
     update_mms()
+         
+    while grid_layout[curr_X_coor][curr_Y_coor][0] != 1 :
+        scan()
+        flood_fill([0],[0])
+        update_mms()
+        decide_path()
+
+    log("searching for better path")
+    flood_fill(target_X,target_Y)
+    update_mms()
+    """
+    while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
+        scan()
+        flood_fill(target_X,target_Y)
+        update_mms()
+        decide_path()
+        
+    log("time")
+    flood_fill([0],[0])
+    update_mms()
            
     while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
         scan()
@@ -229,11 +239,40 @@ def loop():
         decide_path()
     log("back at start")
 
+    while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
+        scan()
+        flood_fill(target_X,target_Y)
+        update_mms()
+        decide_path()
+        
+    log("time")
+    flood_fill([0],[0])
+    update_mms()
+           
+    while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
+        scan()
+        flood_fill([0],[0])
+        update_mms()
+        decide_path()
+    log("back at start")
     
+    flood_fill(target_X,target_Y)
+    update_mms()
+    
+    
+    while True:
+        flood_fill(target_X,target_Y)
+        update_mms()
+        while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
+            decide_path()
 
+        flood_fill([0],[0])
+        update_mms()
+        while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
+            decide_path()
+    """  
     while True:
         pass
-
 
 
 
