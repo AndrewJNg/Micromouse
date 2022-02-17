@@ -13,31 +13,38 @@ def log(string):
 
 def setup():
     API.setColor(curr_X_coor, curr_Y_coor, "G")
-    for i in range(16):
+    for i in range(API.mazeHeight()):
         setWall(0,i,"w")
-        setWall(15,i,"e")
+        setWall(API.mazeWidth()-1,i,"e")
+        
+    for i in range(API.mazeWidth()):
         setWall(i,0,"s")
-        setWall(i,15,"n")
+        setWall(i,API.mazeHeight()-1,"n")
 
 curr_X_coor = 0
 curr_Y_coor = 0
-target_X = [7,8]
-target_Y = [7,8]
+target_X = [7,8]#[3]#[7,8]#[21,22,23]
+target_Y = [7,8]#[1]#[7,8]#[25,26,27]
 curr_dir = 0  
 target_dir = 0
-grid_layout = [[[300, 0, 0] for y in range(API.mazeHeight()+1)] for x in range(API.mazeWidth()+1)]
+
+
+
+grid_layout = [[300 for y in range(API.mazeHeight()+1)] for x in range(API.mazeWidth()+1)]
 #[number]
 grid_wall = [[[0, 0] for y in range(API.mazeHeight()+1)] for x in range(API.mazeWidth()+1)]
-#[top_wall,right_wall]
+#[bottom_wall,left_wall]
 grid_known_cell = [[0 for y in range(API.mazeHeight()+1)] for x in range(API.mazeWidth()+1)]
-#[known-cell (0-new cell, 1-old cell,-1-dead end cell)]
+#[known-cell (0-new cell, 1-old cell)]
+
+possible_route = [0,0]
 
 def update_mms():
     global grid_layout
+
     for x in range(API.mazeWidth()):
         for y in range(API.mazeHeight()):
-            API.setText(x, y, grid_layout[x][y][0])
-            
+            API.setText(x, y, grid_layout[x][y])
             if grid_known_cell[x][y] == 0:
                 pass
             elif grid_known_cell[x][y] == 1:
@@ -54,36 +61,36 @@ def flood_fill(target_X,target_Y):
     #clear all previous readings
     for x in range(API.mazeWidth()):
         for y in range(API.mazeHeight()):
-            grid_layout[x][y][0] = 300
+            grid_layout[x][y] = 300
     
     for x in target_X:
         for y in target_Y:
             API.setColor(x, y, "R")
-            grid_layout[x][y][0] = 0
+            grid_layout[x][y] = 0
     
-    global max_value
     value_flag =1
     value = 0
     while value_flag ==1:
         value_flag = 0
         for x in range(API.mazeWidth()):
             for y in range(API.mazeHeight()):
-                if grid_layout[x][y][0]==value:  
-                    if x < API.mazeWidth()-1 and grid_wall[x][y][1]==0 and grid_layout[x+1][y][0] > value:
-                        grid_layout[x+1][y][0]=value+1 # looking to the right
-                        value_flag = 1
-                    if y < API.mazeHeight()-1 and grid_wall[x][y][0]==0 and grid_layout[x][y+1][0] > value:
-                        grid_layout[x][y+1][0]=value+1 # looking to the top
-                        value_flag = 1
-                    if x > 0 and grid_wall[x-1][y][1]==0 and grid_layout[x-1][y][0] > value:  
-                        grid_layout[x-1][y][0]=value+1 # looking to the left
-                        value_flag = 1
-                    if y > 0 and grid_wall[x][y-1][0]==0 and grid_layout[x][y-1][0] > value: 
-                        grid_layout[x][y-1][0]=value+1 # looking to the bottom
-                        value_flag = 1
+                if grid_layout[x][y]<grid_layout[curr_X_coor][curr_Y_coor]:  #enable for faster search
+                    
+                    if grid_layout[x][y]==value:  
+                        if x < API.mazeWidth()-1 and grid_wall[x+1][y][1]==0 and grid_layout[x+1][y] > value:
+                            grid_layout[x+1][y]=value+1 # looking to the right
+                            value_flag = 1
+                        if y < API.mazeHeight()-1 and grid_wall[x][y+1][0]==0 and grid_layout[x][y+1] > value:
+                            grid_layout[x][y+1]=value+1 # looking to the top
+                            value_flag = 1
+                        if x > 0 and grid_wall[x][y][1]==0 and grid_layout[x-1][y] > value:  
+                            grid_layout[x-1][y]=value+1 # looking to the left
+                            value_flag = 1
+                        if y > 0 and grid_wall[x][y][0]==0 and grid_layout[x][y-1] > value: 
+                            grid_layout[x][y-1]=value+1 # looking to the bottom
+                            value_flag = 1
 
-        value = value+1                  
-    max_value = value
+        value = value+1   
 
 def dir2cardinal(dir):
     if dir == -1:
@@ -111,19 +118,19 @@ def decide_path(virtual=0):
     
     # select best path
     
-    current = grid_layout[curr_X_coor][curr_Y_coor][0]
-    top = grid_layout[curr_X_coor][curr_Y_coor+1][0]
-    left = grid_layout[curr_X_coor-1][curr_Y_coor][0]
-    right = grid_layout[curr_X_coor+1][curr_Y_coor][0]
-    bottom = grid_layout[curr_X_coor][curr_Y_coor-1][0]
+    current = grid_layout[curr_X_coor][curr_Y_coor]
+    top = grid_layout[curr_X_coor][curr_Y_coor+1]
+    left = grid_layout[curr_X_coor-1][curr_Y_coor]
+    right = grid_layout[curr_X_coor+1][curr_Y_coor]
+    bottom = grid_layout[curr_X_coor][curr_Y_coor-1]
 
-    if  top  < current and grid_wall[curr_X_coor][curr_Y_coor][0] == 0:
+    if  top  < current and grid_wall[curr_X_coor][curr_Y_coor+1][0] == 0:
         move(0,virtual)
-    elif right < current and grid_wall[curr_X_coor][curr_Y_coor][1] == 0:
+    elif right < current and grid_wall[curr_X_coor+1][curr_Y_coor][1] == 0:
         move(1,virtual)
-    elif bottom < current and grid_wall[curr_X_coor][curr_Y_coor-1][0] == 0:
+    elif bottom < current and grid_wall[curr_X_coor][curr_Y_coor][0] == 0:
         move(2,virtual)
-    elif left < current and grid_wall[curr_X_coor-1][curr_Y_coor][1] == 0:
+    elif left < current and grid_wall[curr_X_coor][curr_Y_coor][1] == 0:
         move(3, virtual)
     else:
         log("help")   
@@ -145,13 +152,13 @@ def scan():
 def setWall(x,y,D):
     API.setWall(x,y,D)
     if D == "n":
-        grid_wall[x][y][0] = 1
+        grid_wall[x][y+1][0] = 1
     if D == "s":
-        grid_wall[x][y-1][0] = 1
+        grid_wall[x][y][0] = 1
     if D == "w":
-        grid_wall[x-1][y][1] = 1
-    if D == "e":
         grid_wall[x][y][1] = 1
+    if D == "e":
+        grid_wall[x+1][y][1] = 1
 
     
 def move(dir,virtual):
@@ -197,109 +204,15 @@ def move(dir,virtual):
     
     
 
-
+"""
 def sample_map_setup():
     for i in range(2,16):
         setWall(1,i,"e")
     #grid_known_cell[4][5] = 1
-
-def mark_deadend():
-    
-    for x in range(API.mazeWidth()):
-        for y in range(API.mazeHeight()):
-            wall_mark = 0
-            if x ==0 and y ==0:
-                grid_known_cell[0][0] = 1
-            else:
-                if grid_wall[x][y][0] ==1 : wall_mark+=1
-                if grid_wall[x][y][1] ==1 : wall_mark+=1
-                if grid_wall[x][y-1][0] ==1 : wall_mark+=1
-                if grid_wall[x-1][y][1] ==1 : wall_mark+=1
-
-                if wall_mark >=3: # or grid_layout[x][y] == max_value
-                    grid_known_cell[x][y] = -1
-                    grid_wall[x][y][0] =1
-                    grid_wall[x][y][1] =1
-                    grid_wall[x][y-1][0]=1
-                    grid_wall[x-1][y][1]=1
-
-    for x in range(API.mazeWidth(),0,-1):
-        for y in range(API.mazeHeight(),0,-1):
-            wall_mark = 0
-            if x ==0 and y ==0:
-                grid_known_cell[0][0] = 1
-            else:
-                if grid_wall[x][y][0] ==1 : wall_mark+=1
-                if grid_wall[x][y][1] ==1 : wall_mark+=1
-                if grid_wall[x][y-1][0] ==1 : wall_mark+=1
-                if grid_wall[x-1][y][1] ==1 : wall_mark+=1
-
-                if wall_mark >=3: # or grid_layout[x][y] == max_value
-                    grid_known_cell[x][y] = -1
-                    grid_wall[x][y][0] =1
-                    grid_wall[x][y][1] =1
-                    grid_wall[x][y-1][0]=1
-                    grid_wall[x-1][y][1]=1
-def possible_better_path():
-    path_flag =1
-    global curr_X_coor
-    global curr_Y_coor
-    initial_X_coor = curr_X_coor
-    initial_Y_coor = curr_Y_coor
-
-    flood_fill(target_X,target_Y)
-    while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
-        path_flag =0
-        log("possible_better_path?")
-
-        flood_fill(target_X,target_Y)
-        while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
-            decide_path(virtual=1)
-            if grid_known_cell[curr_X_coor][curr_Y_coor]==0: path_flag+=1
-
-        flood_fill([0],[0])
-        while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
-            decide_path(virtual=1)
-            if grid_known_cell[curr_X_coor][curr_Y_coor]==0: path_flag+=1
-    curr_X_coor = initial_X_coor
-    curr_Y_coor = initial_Y_coor
-
-    if path_flag > 0: return (1)
-    else: return (0)
-        
-
-
-def path_check():
-    global path_flag
-    path_check_flag = possible_better_path()
-    while path_check_flag == 1:
-        log("Searching for better path 2")
-
-        flood_fill(target_X,target_Y)
-        while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
-            if grid_known_cell[curr_X_coor][curr_Y_coor] ==1:
-                decide_path()
-            else :
-                scan()
-                flood_fill(target_X,target_Y)
-                update_mms()
-                decide_path()
-
-        flood_fill([0],[0])
-        while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
-            if grid_known_cell[curr_X_coor][curr_Y_coor] ==1:
-                decide_path()
-            else :
-                scan()
-                flood_fill([0],[0])
-                update_mms()
-                decide_path()
-        path_check_flag = possible_better_path()
-
-    log("best path found")
-        
+"""
+      
 def first_Search():
-    while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
+    while grid_layout[curr_X_coor][curr_Y_coor] != 0 :
         if grid_known_cell[curr_X_coor][curr_Y_coor] ==1:
             decide_path()
         else :
@@ -308,12 +221,10 @@ def first_Search():
             update_mms()
             decide_path()
     log("Goal")
-
-    flood_fill([0],[0])
-    update_mms()
-    
     # exit search
-    while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
+    
+    flood_fill([0],[0])
+    while grid_layout[curr_X_coor][curr_Y_coor] != 1 :
         if grid_known_cell[curr_X_coor][curr_Y_coor] ==1:
             decide_path()
         else :
@@ -321,14 +232,112 @@ def first_Search():
             flood_fill([0],[0])
             update_mms()
             decide_path()
-    update_mms()
-
-def loop():
+    
+    
+def possible_better_path():
     global curr_X_coor
     global curr_Y_coor
-    global curr_dir
-    global start_square_value
+    global curr_dir  
+    global target_X
+    global target_Y
+    global possible_route
     
+    
+    initial_X_coor = curr_X_coor
+    initial_Y_coor = curr_Y_coor
+    initial_dir = curr_dir 
+    curr_X_coor = 0
+    curr_Y_coor = 0
+    curr_dir =0
+
+    path_flag =1
+    flood_fill(target_X,target_Y)
+    while grid_layout[curr_X_coor][curr_Y_coor] != 0 :
+        path_flag =0
+        log("possible_better_path?")
+
+        flood_fill(target_X,target_Y)
+        while grid_layout[curr_X_coor][curr_Y_coor] != 0 :
+            decide_path(virtual=1)
+            if grid_known_cell[curr_X_coor][curr_Y_coor]==0: 
+                path_flag+=1
+                if path_flag ==1 :
+                    possible_route = [curr_X_coor,curr_Y_coor]
+                
+                    
+        flood_fill([0],[0])
+        while grid_layout[curr_X_coor][curr_Y_coor] != 0 :
+            decide_path(virtual=1)
+            if grid_known_cell[curr_X_coor][curr_Y_coor]==0: 
+                path_flag+=1
+                if path_flag ==1 :
+                        possible_route = [curr_X_coor,curr_Y_coor]
+                
+    curr_X_coor = initial_X_coor
+    curr_Y_coor = initial_Y_coor
+    curr_dir = initial_dir
+
+    if path_flag > 0: return (1)
+    else: return (0)
+        
+
+
+def path_check():
+    while possible_better_path():
+        log(possible_route)
+        travel(possible_route[0],possible_route[1])
+        
+        #move to the goal to update this cell
+        scan()
+        grid_known_cell[curr_X_coor][curr_Y_coor] = 1
+        flood_fill(target_X,target_Y)
+        #flood_fill([possible_route[0]],[possible_route[1]])
+        update_mms()
+        #decide_path()
+    
+    log("best path found")
+    travel(0,0)
+  
+def speed_run():
+    log("speed run")
+    while True:
+        flood_fill(target_X,target_Y)
+        update_mms()
+        while grid_layout[curr_X_coor][curr_Y_coor] != 0 :
+            decide_path()
+
+        flood_fill([0],[0])
+        update_mms()
+        while grid_layout[curr_X_coor][curr_Y_coor] != 0 :
+            decide_path()
+            
+        update_mms()
+
+def travel(X,Y):
+        flood_fill([X],[Y])
+        while grid_layout[curr_X_coor][curr_Y_coor] != 0 :
+            if grid_known_cell[curr_X_coor][curr_Y_coor] ==1:
+                decide_path()
+            else :
+                scan()
+                flood_fill([X],[Y])
+                update_mms()
+                decide_path()
+        
+
+def loop():
+    """
+    travel(2,0)
+    travel(6,0)
+    travel(4,2)
+    travel(7,2)
+    travel(6,4)
+    travel(0,1)
+    travel(1,4)
+    travel(0,7)
+    travel(3,6)
+    travel(6,7)
+    """
     # first search
     first_Search()
     
@@ -336,21 +345,11 @@ def loop():
     path_check()
 
     #speed run
+    speed_run()
     
-    log("speed run")
     while True:
-        mark_deadend()
-        flood_fill(target_X,target_Y)
-        update_mms()
-        while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
-            decide_path()
-
-        flood_fill([0],[0])
-        update_mms()
-        while grid_layout[curr_X_coor][curr_Y_coor][0] != 0 :
-            decide_path()
-            
-        update_mms()
+        pass
+   
         
     
 
