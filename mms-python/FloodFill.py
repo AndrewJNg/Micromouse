@@ -40,6 +40,7 @@ grid_known_cell = [[0 for y in range(API.mazeHeight()+1)] for x in range(API.maz
 possible_route = [0,0]
 
 def update_mms():
+    
     global grid_layout
 
     for x in range(API.mazeWidth()):
