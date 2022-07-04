@@ -51,9 +51,9 @@ void loop() {
   Serial.print("\t");
   Serial.print(pwm_value);
   Serial.print("\t");
-  Serial.print(map(pwm_value, 31, 1056, 0, 359));
+  Serial.print(map(pwm_value, 31, 1077, 0, 3599));
   Serial.print("\t");
   Serial.print(pwm_value2);
   Serial.print("\t");
-  Serial.println(map(pwm_value2, 32, 1077, 0, 359));
+  Serial.println(map(pwm_value2, 32, 1056, 0, 359));
 }
