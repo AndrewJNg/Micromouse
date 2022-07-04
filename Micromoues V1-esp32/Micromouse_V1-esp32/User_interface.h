@@ -49,41 +49,60 @@ void OLED_display()
     //    OLED.print("Volt: ");
     //    OLED.println(Voltage_level());
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // motor & encoder 
     OLED.print("L_Enc: ");
-    OLED.println(AS5600_I2C_update_1());
+//    OLED.println(encValLeft());
+//    OLED.println(AS5600_I2C_update_1());
+    OLED.println(currAngle[0]);
     //    OLED.println();
     OLED.print("R_Enc: ");
-    OLED.println(AS5600_I2C_update_2());
+//    OLED.println(encValRight());
+//    OLED.println(AS5600_I2C_update_2());
+    OLED.println(currAngle[1]);
     OLED.println();
+    
+//    OLED.print("motorL: ");
+//    OLED.println(motorForward[0]);
+//    //    OLED.println();
+//    OLED.print("MotorR: ");
+//    OLED.println(motorForward[1]);
+//    OLED.println();
 
-    OLED.print("L_Motor: ");
-    OLED.println(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY));
-    //    OLED.println();
-    OLED.print("R_Motor: ");
-    OLED.println(PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
-    OLED.println();
-//    OLED.print("IRFront:  ");
-//    OLED.print(IRVal[0]);
-//    OLED.print("  ");
-//    OLED.println(IRVal[5]);
-//
-//    OLED.print("IR45:     ");
-//    OLED.print(IRVal[1] );
-//    OLED.print("  ");
-//    OLED.println(IRVal[4] );
-//
-//    OLED.print("IRSide:   ");
-//    OLED.print(IRVal[2]);
-//    OLED.print("  ");
-//    OLED.println(IRVal[3]);
+//    OLED.print("L_Motor: ");
+//    OLED.println(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY));
+//    //    OLED.println();
+//    OLED.print("R_Motor: ");
+//    OLED.println(PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
+//    OLED.println();
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // IR
+    OLED.print("IRFront:  ");
+    OLED.print(IRVal[0]);
+    OLED.print("  ");
+    OLED.println(IRVal[5]);
+
+    OLED.print("IR45:     ");
+    OLED.print(IRVal[1] );
+    OLED.print("  ");
+    OLED.println(IRVal[4] );
+
+    OLED.print("IRSide:   ");
+    OLED.print(IRVal[2]);
+    OLED.print("  ");
+    OLED.println(IRVal[3]);
+    
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Gyro
     OLED.println("Gyro    ");
     OLED.print("X:");
     OLED.print( gyroX, 1);
     OLED.print(" Y:");
     OLED.print( gyroY, 1);
     OLED.print(" Z:");
-    OLED.println( gyroZ, 1);
+//    OLED.println( gyroZ, 1);
+    OLED.println( MPU_Z_angle(), 1);
 
 
 

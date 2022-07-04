@@ -247,11 +247,31 @@ void MPU6050_setup() {
 // ================================================================
 // ===                    MAIN PROGRAM LOOP                     ===
 // ================================================================
+
+
+
+double MPU_Z_angle()
+{ 
+  static double prevAngle = 0;
+  static int multiplyAngle = 0;
+
+
+  // obtain absolute Z angle from start
+  double currAngle = ypr[0] * 180 / M_PI;
+
+  if ((prevAngle > 90 && prevAngle < 180  ) && ( currAngle > -180 &&  currAngle < -90)  ) multiplyAngle ++;
+  else if ((prevAngle > -180 &&  prevAngle < -90) && (currAngle > 90 && currAngle < 180)  ) multiplyAngle --;
+  prevAngle = currAngle;
+
+  currAngle = currAngle + multiplyAngle * 360;
+  return currAngle;
+}
+
 double gyroX=0;
 double gyroY=0;
 double gyroZ=0;
 
-void MPU6050_get_data()
+void gyro_get_data()
 {
   // if programming failed, don't try to do anything
   if (!dmpReady) return;
@@ -265,7 +285,8 @@ void MPU6050_get_data()
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
     gyroX = -ypr[1] * 180 / M_PI;
     gyroY = ypr[2] * 180 / M_PI;
-    gyroZ= ypr[0] * 180 / M_PI;
+//    gyroZ= ypr[0] * 180 / M_PI;
+    gyroZ= MPU_Z_angle();
 //    Serial.print("ypr\t");
 //    Serial.print(ypr[0] * 180 / M_PI);
 //    Serial.print("\t");
@@ -273,7 +294,5 @@ void MPU6050_get_data()
 //    Serial.print("\t");
 //    Serial.println(ypr[2] * 180 / M_PI);
 #endif
-
-
   }
 }

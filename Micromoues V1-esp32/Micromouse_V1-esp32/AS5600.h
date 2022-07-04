@@ -135,8 +135,112 @@ int AS5600_I2C_update_2()
   int high =  I2Ctwo.read();
   int low =  I2Ctwo.read();
   int value = ( high << 8 ) | low;
-  
+
   //invert direction
-//  value = 4095 - value;
+  //  value = 4095 - value;
   return value;
 }
+
+
+double currAngle[2] = {0, 0};
+//unsigned long enc_menu_prevMillis = 0;
+
+void enc_menu_update()
+{
+  static double prevAngle[2] = {0, 0};
+  static int multiplyAngle[2] = {0, 0};
+
+  currAngle[0] = ((double) map(AS5600_I2C_update_1(), 0, 4095, -18000, 18000) / 100);
+  currAngle[1] = ((double) map(AS5600_I2C_update_2(), 0, 4095, -18000, 18000) / 100);
+
+  for (int i = 0; i < 2; i++)
+  {
+    if ((prevAngle[i] > 90 && prevAngle[i]  < 180  ) && ( currAngle[i]  > -180 &&  currAngle[i]  < -90)  ) multiplyAngle[i]++;
+    else if ((prevAngle[i]  > -180 &&  prevAngle[i]  < -90) && (currAngle[i]  > 90 && currAngle[i]  < 180)  ) multiplyAngle[i]--;
+    prevAngle[i]  = currAngle[i] ;
+
+    currAngle[i]  = currAngle[i]  + multiplyAngle[i]  * 360;
+  }
+
+}
+
+
+bool motorForward[2] = {true, true};
+
+void enc_motor_update()
+{
+  static double prevAngle[2] = {0, 0};
+  static int multiplyAngle[2] = {0, 0};
+
+  currAngle[0] = ((double) map(AS5600_I2C_update_1(), 0, 4095, -18000, 18000) / 100);
+  currAngle[1] = ((double) map(AS5600_I2C_update_2(), 0, 4095, -18000, 18000) / 100);
+
+  for (int i = 0; i < 2; i++)
+  {
+
+    if (currAngle[i] < (prevAngle[i] - 50))
+    {
+      if (motorForward[i] == true)
+      {
+        multiplyAngle[i]++;
+      }
+    }
+
+    if (currAngle[i] > ( prevAngle[i] + 50))
+    {
+      if (motorForward[i] == false)
+      {
+        multiplyAngle[i]--;
+      }
+
+    }
+    prevAngle[i]  = currAngle[i] ;
+    currAngle[i]  = currAngle[i]  + multiplyAngle[i]  * 360;
+  }
+
+}
+
+
+
+
+//double encValLeft()
+//{
+//  static double prevAngle = 0;
+//  static int multiplyAngle = 0;
+//
+//  // obtain absolute Z angle from start
+//  double currAngle = ((double) map(AS5600_I2C_update_1(), 0, 4095, -18000, 18000) / 100); //ypr[0] * 180 / M_PI;
+//
+//  if ((prevAngle > 90 && prevAngle < 180  ) && ( currAngle > -180 &&  currAngle < -90)  ) multiplyAngle ++;
+//  else if ((prevAngle > -180 &&  prevAngle < -90) && (currAngle > 90 && currAngle < 180)  ) multiplyAngle --;
+//  prevAngle = currAngle;
+//
+//  currAngle = currAngle + multiplyAngle * 360;
+//  return currAngle;
+//}
+//
+//double encValRight()
+//{
+//  static double prevAngle = 0;
+//  static int multiplyAngle = 0;
+//
+//  // obtain absolute Z angle from start
+//  double currAngle =  ((double)map(AS5600_I2C_update_2(), 0, 4095, -18000, 18000) / 100); // * 180 / M_PI;
+//
+//  if ((prevAngle > 90 && prevAngle < 180  ) && ( currAngle > -180 &&  currAngle < -90)  ) multiplyAngle ++;
+//  else if ((prevAngle > -180 &&  prevAngle < -90) && (currAngle > 90 && currAngle < 180)  ) multiplyAngle --;
+//  prevAngle = currAngle;
+//
+//  currAngle = currAngle + multiplyAngle * 360;
+//  return currAngle;
+//}
+
+
+//int enc_update()
+//{
+//  int leftRaw = AS5600_I2C_update_1();
+//  int rightRaw = AS5600_I2C_update_2();
+//
+//
+//  return
+//}

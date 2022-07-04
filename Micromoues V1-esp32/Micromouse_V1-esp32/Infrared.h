@@ -8,7 +8,7 @@ int IRVal[6] = {0, 0, 0, 0, 0, 0};
 
 unsigned long IR_prevMillis = 0;
 
-void update_IR_val()
+void update_IR()
 {
   unsigned long IR_currentMillis = millis();
 
