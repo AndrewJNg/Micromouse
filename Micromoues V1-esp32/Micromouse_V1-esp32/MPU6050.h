@@ -159,7 +159,7 @@ void dmpDataReady() {
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
-void MPU6050_setup() {
+void Gyro_setup() {
   // join I2C bus (I2Cdev library doesn't do this automatically)
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
   Wire.begin();
@@ -271,7 +271,7 @@ double gyroX=0;
 double gyroY=0;
 double gyroZ=0;
 
-void gyro_get_data()
+void Gyro_update()
 {
   // if programming failed, don't try to do anything
   if (!dmpReady) return;

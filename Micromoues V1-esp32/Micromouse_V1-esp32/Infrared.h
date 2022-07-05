@@ -5,10 +5,23 @@ const byte IRRecPin[6] = {36, 39, 32, 33, 34, 35};
 
 int IRVal[6] = {0, 0, 0, 0, 0, 0};
 
-
 unsigned long IR_prevMillis = 0;
 
-void update_IR()
+// function prototypes
+void IR_setup();
+void IR_update();
+
+
+
+void IR_setup()
+{
+  for (int x = 0; x < sizeof(IREmitPin); x++)
+  {
+    pinMode(IREmitPin[x], OUTPUT);
+  }
+}
+
+void IR_update()
 {
   unsigned long IR_currentMillis = millis();
 
@@ -32,18 +45,8 @@ void update_IR()
 }
 
 
-void IR_distance()
-{
-
-
-}
-
-
-void IR_setup()
-{
-  for (int x = 0; x < sizeof(IREmitPin); x++)
-  {
-    pinMode(IREmitPin[x], OUTPUT);
-  }
-
-}
+//void IR_distance()
+//{
+//
+//
+//}

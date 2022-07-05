@@ -66,7 +66,7 @@ void motor(int speedLeft, int speedRight)
 
 
 
-void movement_setup()
+void Motor_setup()
 {
 
   // activate Standby pin

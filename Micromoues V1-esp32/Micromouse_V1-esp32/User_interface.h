@@ -37,8 +37,13 @@ void OLED_display()
 {
   unsigned long OLED_currentMillis = millis();
 
-  // OLED display refresh at 20Hz
-  if (OLED_currentMillis - OLED_prevMillis >= 50) {
+  static unsigned long prevMillis = 0;
+  prevMillis = micros();
+  
+  // OLED display refresh at 10Hz
+  // OLED takes 30ms to refresh
+  
+  if (OLED_currentMillis - OLED_prevMillis >= 100) {
     OLED_prevMillis = OLED_currentMillis;
 
     OLED.clearDisplay();
@@ -54,12 +59,14 @@ void OLED_display()
     OLED.print("L_Enc: ");
 //    OLED.println(encValLeft());
 //    OLED.println(AS5600_I2C_update_1());
-    OLED.println(currAngle[0]);
+//    OLED.println(currAngle[0]);
+    OLED.println(encSpeed(0));
     //    OLED.println();
     OLED.print("R_Enc: ");
 //    OLED.println(encValRight());
 //    OLED.println(AS5600_I2C_update_2());
-    OLED.println(currAngle[1]);
+//    OLED.println(currAngle[1]);
+    OLED.println(encSpeed(1));
     OLED.println();
     
 //    OLED.print("motorL: ");
@@ -108,6 +115,8 @@ void OLED_display()
 
 
     OLED.display();
+//  Serial.print("OLED:");
+//  Serial.print(micros()-prevMillis);
   }
 }
 
