@@ -12,7 +12,6 @@ void IR_setup();
 void IR_update();
 
 
-
 void IR_setup()
 {
   for (int x = 0; x < sizeof(IREmitPin); x++)

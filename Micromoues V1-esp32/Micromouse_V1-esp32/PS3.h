@@ -9,8 +9,8 @@ int stick_LX;
 int stick_LY;
 int stick_RX;
 int stick_RY;
-
-int up_button;
+int PS3Batt;
+//int PS3Select;
 
 void notify()
 {
@@ -25,25 +25,24 @@ void notify()
     stick_RY = -Ps3.data.analog.stick.ry;
   }
 
+  if ( Ps3.event.button_down.select ) Start = false;
+  if ( Ps3.event.button_down.start ) Start = true;
+  //        Serial.println("Started pressing the select button");
+  if ( Ps3.event.button_down.up )Mode++;
+  if ( Ps3.event.button_down.down )Mode--;
 
-//    if( Ps3.event.button_down.up )
-//        var =1;
-//    if( Ps3.event.button_up.up )
-//        var=0;
-//  if(1)
-//  {
-//    
-//Stepper_run(0);
-//  }
-
-  /*
-    Serial.print(stick_LX); Serial.print("    ");
-    Serial.print(stick_LY); Serial.print("    ");
-    Serial.print(stick_RX); Serial.print("    ");
-    Serial.print(stick_RY); Serial.print("    ");
-    Serial.print(Ps3.data.button.l1); Serial.print("    ");
-    Serial.println(Ps3.data.button.r1); Serial.print("    ");
-  */
+  //---------------------- Battery events ---------------------
+  if ( battery != Ps3.data.status.battery ) {
+    battery = Ps3.data.status.battery;
+    //        Serial.print("The controller battery is ");
+    if ( battery == ps3_status_battery_charging )      PS3Batt = 5;
+    else if ( battery == ps3_status_battery_full )     PS3Batt = 4;
+    else if ( battery == ps3_status_battery_high )     PS3Batt = 3;
+    else if ( battery == ps3_status_battery_low)      PS3Batt = 2;
+    else if ( battery == ps3_status_battery_dying )    PS3Batt = 1;
+    else if ( battery == ps3_status_battery_shutdown ) PS3Batt = 0;
+    //        else Serial.println("UNDEFINED");
+  }
 }
 
 void onConnect() {
@@ -70,20 +69,20 @@ float PS3_LeftAnalogStickAngle (int LX, int LY)
   return angle;
 }
 
-float PS3_LeftAnalogStickSpeed(int LX, int LY)
+float PS3_LeftAnalogStickSpeed(int X, int Y)
 {
-  float LX_vector = 0;
-  float LY_vector = 0;
-//  if (abs(LX) > 15) LX_vector = map(LX, -128, 127, -10000, 10000) / 100;
-  if (abs(LX) > 15) LX_vector = map(LX, -128, 127, -10000, 10000) / 100;
-//  else LX_vector = 0;
-//  if (abs(LY) > 15) LY_vector = map(LY, -127, 128, -10000, 10000) / 100;
-  if (abs(LY) > 15) LY_vector = map(LY, -127, 128, -25500, 25500) / 100;
-//  else LY_vector = 0;
+  float X_vector = 0;
+  float Y_vector = 0;
+  //  if (abs(LX) > 15) LX_vector = map(LX, -128, 127, -10000, 10000) / 100;
+  if (abs(X) > 15) X_vector = map(X, -128, 127, -10000, 10000) / 100;
+  //  else LX_vector = 0;
+  //  if (abs(LY) > 15) LY_vector = map(LY, -127, 128, -10000, 10000) / 100;
+  if (abs(Y) > 15) Y_vector = map(Y, -127, 128, -25500, 25500) / 100;
+  //  else LY_vector = 0;
 
-//  float Speed = sqrt(LX_vector * LX_vector + LY_vector * LY_vector);
-  float Speed = LY_vector;//sqrt( LY_vector);
-//  if (Speed > 100) Speed = 100;
+  //  float Speed = sqrt(LX_vector * LX_vector + LY_vector * LY_vector);
+  float Speed = Y_vector;//sqrt( LY_vector);
+  //  if (Speed > 100) Speed = 100;
 
   //  Serial.println(Speed);
   return Speed;

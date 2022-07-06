@@ -3,131 +3,140 @@ int pot_Value = 0;
 const int pot_Pin = 36;
 const byte battMonitor_Pin = 32;
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// OLED display
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64
-#define OLED_RESET     4
-Adafruit_SSD1306 OLED(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+bool left_IR_button();
+bool right_IR_button();
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //disable voltage_level reading for 6 sensor configuration
-
-
-
 //const float R2 = 10.00;  // in kOhm
 //const float R1 = 9.85 + 9.77;
-//float voltage_level()
-//{
+float voltage_level()
+{
 //  float input_volt = (map(analogRead(battMonitor_Pin), 0, 4095, 0, 3300)) / 1000.00 ;
 //  return (input_volt / (R2 / (R1 + R2)));
-//}
+ return map(PS3Batt,0,4,0,99);
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-unsigned long OLED_prevMillis = 0;
 
-void OLED_display()
+bool left_IR_button()
 {
-  unsigned long OLED_currentMillis = millis();
+  int sum = 0;
+  for (int i = 0; i < 3; i++)
+  {
+    if (IRVal[i] > 3000) sum++;
 
-  static unsigned long prevMillis = 0;
-  prevMillis = micros();
-  
-  // OLED display refresh at 10Hz
-  // OLED takes 30ms to refresh
-  
-  if (OLED_currentMillis - OLED_prevMillis >= 100) {
-    OLED_prevMillis = OLED_currentMillis;
-
-    OLED.clearDisplay();
-
-    OLED.setTextSize(1);      // Normal 1:1 pixel scale
-    OLED.setTextColor(SSD1306_WHITE); // Draw white text
-    OLED.setCursor(0, 0);     // Start at top-left corner
-    //    OLED.print("Volt: ");
-    //    OLED.println(Voltage_level());
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // motor & encoder 
-    OLED.print("L_Enc: ");
-//    OLED.println(encValLeft());
-//    OLED.println(AS5600_I2C_update_1());
-//    OLED.println(currAngle[0]);
-    OLED.println(encSpeed(0));
-    //    OLED.println();
-    OLED.print("R_Enc: ");
-//    OLED.println(encValRight());
-//    OLED.println(AS5600_I2C_update_2());
-//    OLED.println(currAngle[1]);
-    OLED.println(encSpeed(1));
-    OLED.println();
-    
-//    OLED.print("motorL: ");
-//    OLED.println(motorForward[0]);
-//    //    OLED.println();
-//    OLED.print("MotorR: ");
-//    OLED.println(motorForward[1]);
-//    OLED.println();
-
-//    OLED.print("L_Motor: ");
-//    OLED.println(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY));
-//    //    OLED.println();
-//    OLED.print("R_Motor: ");
-//    OLED.println(PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
-//    OLED.println();
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // IR
-    OLED.print("IRFront:  ");
-    OLED.print(IRVal[0]);
-    OLED.print("  ");
-    OLED.println(IRVal[5]);
-
-    OLED.print("IR45:     ");
-    OLED.print(IRVal[1] );
-    OLED.print("  ");
-    OLED.println(IRVal[4] );
-
-    OLED.print("IRSide:   ");
-    OLED.print(IRVal[2]);
-    OLED.print("  ");
-    OLED.println(IRVal[3]);
-    
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Gyro
-    OLED.println("Gyro    ");
-    OLED.print("X:");
-    OLED.print( gyroX, 1);
-    OLED.print(" Y:");
-    OLED.print( gyroY, 1);
-    OLED.print(" Z:");
-//    OLED.println( gyroZ, 1);
-    OLED.println( MPU_Z_angle(), 1);
-
-
-
-
-    OLED.display();
-//  Serial.print("OLED:");
-//  Serial.print(micros()-prevMillis);
   }
+  //  Serial.print(sum);
+  //  Serial.print("  ");
+  if (sum == 3)return true;
+  else return false;
 }
 
-void user_interface_setup()
+bool right_IR_button()
 {
-  // User_interface setup
-  if (!OLED.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x64
-    //    Serial.println(F("SSD1306 allocation failed"));
-    for (;;); // Don't proceed, loop forever
-  }
-  OLED.clearDisplay();
-  OLED.display();
+  int sum = 0;
+  for (int i = 3; i < 6; i++)
+  {
+    if (IRVal[i] > 3000) sum++;
 
+  }
+  //  Serial.print(sum);
+  //  Serial.print("  ");
+  if (sum == 3)return true;
+  else return false;
+}
+
+
+int counter = 0;
+int count_minus()
+{
+  //  static int counter=0;
+  static unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
+  static unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
+  static boolean lastButtonState = false;   // the previous reading from the input pin
+  static int buttonState = 0;           // the current reading from the input pin
+
+  int reading = left_IR_button();
+
+
+  if (reading != lastButtonState) {
+    // reset the debouncing timer
+    lastDebounceTime = millis();
+  }
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    // whatever the reading is at, it's been there for longer than the debounce
+    // delay, so take it as the actual current state:
+
+    // if the button state has changed:
+    if (reading != buttonState) {
+      buttonState = reading;
+
+      // only toggle the LED if the new button state is HIGH
+      if (buttonState == HIGH) {
+        //        counter--;
+        Mode--;
+
+        Start = false;
+      }
+
+    }
+  }
+
+  // set the LED:
+
+  lastButtonState = reading;
+  // save the reading. Next time through the loop, it'll be the lastButtonState:
+  return counter;
+}
+
+int count_plus()
+{
+  static unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
+  static unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
+  static boolean lastButtonState = false;   // the previous reading from the input pin
+  static int buttonState = 0;           // the current reading from the input pin
+
+  int reading = right_IR_button();
+
+
+  if (reading != lastButtonState) {
+    // reset the debouncing timer
+    lastDebounceTime = millis();
+  }
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    // whatever the reading is at, it's been there for longer than the debounce
+    // delay, so take it as the actual current state:
+
+    // if the button state has changed:
+    if (reading != buttonState) {
+      buttonState = reading;
+
+      // only toggle the LED if the new button state is HIGH
+      if (buttonState == HIGH) {
+        //        counter++;
+        //        Mode++;
+        //        if (Mode > 4)
+        //        {
+        //          Mode = 1;
+        //        }
+        //        else if (Mode < 1)
+        //        {
+        //          Mode = 4;
+        //        }
+        Start = true;
+      }
+
+    }
+  }
+
+  // set the LED:
+
+  lastButtonState = reading;
+  // save the reading. Next time through the loop, it'll be the lastButtonState:
+  return counter;
 }

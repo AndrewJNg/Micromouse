@@ -248,6 +248,12 @@ void enc_motor_update()
 
 double encDistance(int returnNum)
 {
+//  static double Init[2] = {0, 0};
+//  if (Reset == true)
+//  {
+//    Init[0] = currAngle[0];
+//    Init[1] = currAngle[1];
+//  }
   const float radius = 17; //34mm in diameter
   const float pi = 3.142;
 
@@ -266,6 +272,7 @@ double encDistance(int returnNum)
   //Serial.print("  ");
   //Serial.println(distance);
   return distance[returnNum];
+//  return distance[returnNum] - Init[returnNum];
 
 
 }
@@ -295,28 +302,5 @@ double encSpeed(int returnNum)
     //      Serial.println(Speed[returnNum]);
     prevMillis[returnNum] = millis();
   }
-  //    else
-  //    {
-  //      Speed[returnNum] =0;
-  //    }
-
-
-  //  if ((millis() - prevMillis) > 100)
-  //  {
-  //    prevDistance =  currDistance;
-  //    Serial.print("diff: ");
-  //    Serial.print(diff);
-  //
-  //    Serial.print(" time: ");
-  //    Serial.print(millis() - prevMillis);
-  //    Speed = (diff * 1000) / ((millis() - prevMillis)); // * 100;
-  //
-  //    Serial.print(" speed: ");
-  //    Serial.println(Speed);
-  //    prevMillis = millis();
-  //  }
-
-
-  //    Serial.print(micros()-prevMillis);
   return Speed[returnNum];
 }
