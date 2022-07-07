@@ -20,10 +20,10 @@ const int PWM_resolution_max_value = 255;//65535;
 void motor(int speedLeft, int speedRight)
 {
   system();
-  if(speedLeft>255) speedLeft = 255;
-  else if(speedLeft<-255) speedLeft = -255;
-  if(speedRight>255) speedRight = 255;
-  else if(speedRight<-255) speedRight= -255;
+  if (speedLeft > 255) speedLeft = 255;
+  else if (speedLeft < -255) speedLeft = -255;
+  if (speedRight > 255) speedRight = 255;
+  else if (speedRight < -255) speedRight = -255;
   // invert motors when needed
   if (speedLeft > 0)
     motorForward[0] = true;
@@ -90,5 +90,9 @@ void Motor_setup()
     //set pwm pins
     ledcSetup(motorChannel[x], 5000, PWM_resolution);
     ledcAttachPin(motorPWM[x] , motorChannel[x] );
+
+    digitalWrite(motorPin1[x], HIGH);
+    digitalWrite(motorPin2[x], HIGH);
+    ledcWrite(motorChannel[x] , 0);
   }
 }

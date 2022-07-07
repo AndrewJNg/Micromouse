@@ -317,101 +317,69 @@ void OledTimer()
 
 void OLED_display_stats()
 {
-  unsigned long OLED_currentMillis = millis();
-
   static unsigned long prevMillis = 0;
-  prevMillis = micros();
+  unsigned long currentMillis = millis();
 
   // OLED display refresh at 10Hz
-  // OLED takes 30ms to refresh
-
-  if (OLED_currentMillis - OLED_prevMillis >= 100) {
-    OLED_prevMillis = OLED_currentMillis;
+  if (currentMillis - prevMillis >= 100) {
+    prevMillis = currentMillis;
+    unsigned long timeRecord = micros();
 
     OLED.clearDisplay();
 
     OLED.setTextSize(1);      // Normal 1:1 pixel scale
     OLED.setTextColor(SSD1306_WHITE); // Draw white text
     OLED.setCursor(0, 0);     // Start at top-left corner
-    //    OLED.print("Volt: ");
-    //    OLED.println(Voltage_level());
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // motor & encoder
-    OLED.print("startPoint: ");
-    OLED.print(startPoint);
-    
-    OLED.println();
-     
-    OLED.print("endPoint: ");
-    OLED.print(endPoint);
-    OLED.println();
-     
-    OLED.print("diff: ");
-    OLED.print(endPoint-startPoint);
-    OLED.println();
-    OLED.println();
-//    OLED.print("L_Enc: ");
-    //    OLED.println(encValLeft());
-    //    OLED.println(AS5600_I2C_update_1());
-    //    OLED.println(currAngle[0]);
-//    OLED.println(encSpeed(0));
-    //    OLED.println();
-//    OLED.print("R_Enc: ");
-    //    OLED.println(encValRight());
-    //    OLED.println(AS5600_I2C_update_2());
-    //    OLED.println(currAngle[1]);
-//    OLED.println(encSpeed(1));
-//    OLED.println();
-
-    //    OLED.print("motorL: ");
-    //    OLED.println(motorForward[0]);
-    //    //    OLED.println();
-    //    OLED.print("MotorR: ");
-    //    OLED.println(motorForward[1]);
-    //    OLED.println();
-
-    //    OLED.print("L_Motor: ");
-    //    OLED.println(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY));
-    //    //    OLED.println();
-    //    OLED.print("R_Motor: ");
-    //    OLED.println(PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
-    //    OLED.println();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // IR
-    OLED.print("IRFront:  ");
-    OLED.print(IRVal[0]);
-    OLED.print("  ");
-    OLED.println(IRVal[5]);
-
-    OLED.print("IR45:     ");
-    OLED.print(IRVal[1] );
-    OLED.print("  ");
-    OLED.println(IRVal[4] );
-
-    OLED.print("IRSide:   ");
-    OLED.print(IRVal[2]);
-    OLED.print("  ");
-    OLED.println(IRVal[3]);
+//    OLED.print("IRFront:  ");
+//    OLED.print(IRVal[0]);
+//    OLED.print("  ");
+//    OLED.println(IRVal[5]);
+//
+//    OLED.print("IR45:     ");
+//    OLED.print(IRVal[1] );
+//    OLED.print("  ");
+//    OLED.println(IRVal[4] );
+//
+//    OLED.print("IRSide:   ");
+//    OLED.print(IRVal[2]);
+//    OLED.print("  ");
+//    OLED.println(IRVal[3]);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Gyro
-//    OLED.println("Gyro    ");
+    //    OLED.println("Gyro    ");
+//    OLED.println("  ");
 //    OLED.print("X:");
 //    OLED.print( gyroX, 1);
 //    OLED.print(" Y:");
 //    OLED.print( gyroY, 1);
 //    OLED.print(" Z:");
-    //    OLED.println( gyroZ, 1);
+//    //    OLED.println( gyroZ, 1);
 //    OLED.println( MPU_Z_angle(), 1);
 
+//    OLED.print("OLED: ");
+//    OLED.println(micros() - timeRecord);
+    
+    OLED.print("P: ");
+    OLED.println(Kp);
+    OLED.print("I: ");
+    OLED.println(Ki);
+    OLED.print("D: ");
+    OLED.println(Kd);
 
+    OLED.print(" Set: ");
+    OLED.println( Setpoint);
+    OLED.print(" Z: ");
+    OLED.println( MPU_Z_angle(), 1);
 
 
     OLED.display();
-    //  Serial.print("OLED:");
-    //  Serial.print(micros()-prevMillis);
   }
 }
 

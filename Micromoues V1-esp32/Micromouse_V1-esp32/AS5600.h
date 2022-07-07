@@ -41,38 +41,43 @@ void AS5600_I2C_setup_1()
 {
   Wire.begin(SDA_1, SCL_1, 400000);
   delay(5);
-  Wire.beginTransmission(byte(0x36));
-  Wire.write(byte(0x01));
-  Wire.write(byte(0x00));
+
+  // set start position (ZPOS) as 0 
+  Wire.beginTransmission(byte(0x36));  
+  Wire.write(byte(0x01));    // enter first ZPOS address
+  Wire.write(byte(0x00));    // set as 0
   Wire.endTransmission();
   delay(5);
   Wire.beginTransmission(byte(0x36));
-  Wire.write(byte(0x02));
-  Wire.write(byte(0x00));
+  Wire.write(byte(0x02));     // enter second ZPOS address
+  Wire.write(byte(0x00));     // set as 0
   Wire.endTransmission();
   delay(5);
 
+  // set stop position (MPOS) as 0 
   Wire.beginTransmission(byte(0x36));
-  Wire.write(byte(0x03));
-  Wire.write(byte(0x00));
+  Wire.write(byte(0x03));     // enter second MPOS address
+  Wire.write(byte(0x00));     // set as 0
   Wire.endTransmission();
   delay(5);
   Wire.beginTransmission(byte(0x36));
-  Wire.write(byte(0x04));
-  Wire.write(byte(0x00));
-  Wire.endTransmission();
-  delay(5);
-
-  Wire.beginTransmission(byte(0x36));
-  Wire.write(byte(0x07));
-  //  Wire.write(byte(0x23));
-  I2Ctwo.write(byte(0x3F));
+  Wire.write(byte(0x04));     // enter second MPOS address
+  Wire.write(byte(0x00));     // set as 0
   Wire.endTransmission();
   delay(5);
 
+
+  // set configuration settings  
   Wire.beginTransmission(byte(0x36));
-  Wire.write(byte(0x08));
-  Wire.write(byte(0xE3));
+  Wire.write(byte(0x07));       // enter first config address
+  Wire.write(byte(0x03));    // switch off watchdog, switch off fast filtering, and turn slow filtering to fastest responce
+//  IWire.write(byte(0x3F));    //
+  Wire.endTransmission();
+  delay(5);
+  Wire.beginTransmission(byte(0x36));
+  Wire.write(byte(0x08));    // enter second config address
+  Wire.write(byte(0x20));   // switch off watchdog, switch off fast filtering, and turn slow filtering to fastest responce
+//  Wire.write(byte(0xE3));   // switch off watchdog, switch off fast filtering, and turn slow filtering to fastest responce
   Wire.endTransmission();
   delay(5);
 }
@@ -122,7 +127,8 @@ int AS5600_I2C_update_1()
 {
 
   Wire.beginTransmission(byte(0x36));
-  Wire.write(byte(0X0C));
+//  Wire.write(byte(0X0C));  //raw angle
+  Wire.write(byte(0X0E)); // filtered angle
   Wire.endTransmission();
   Wire.requestFrom(byte(0x36), 2);
   while (Wire.available() < 2) ;
