@@ -321,7 +321,7 @@ void OLED_display_stats()
   unsigned long currentMillis = millis();
 
   // OLED display refresh at 10Hz
-  if (currentMillis - prevMillis >= 100) {
+  if (currentMillis - prevMillis >= 1000) {
     prevMillis = currentMillis;
     unsigned long timeRecord = micros();
 
@@ -373,10 +373,10 @@ void OLED_display_stats()
     OLED.print("D: ");
     OLED.println(Kd);
 
-    OLED.print(" Set: ");
-    OLED.println( Setpoint);
-    OLED.print(" Z: ");
-    OLED.println( MPU_Z_angle(), 1);
+//    OLED.print(" Set: ");
+//    OLED.println( Setpoint);
+//    OLED.print(" Z: ");
+//    OLED.println( MPU_Z_angle(), 1);
 
 
     OLED.display();
