@@ -125,43 +125,6 @@ void AS5600_I2C_setup_2()
 //  I2Ctwo.write(byte(0xE3));   // switch off watchdog, switch off fast filtering, and turn slow filtering to fastest responce
   I2Ctwo.endTransmission();
   delay(5);
-//  I2Ctwo.begin(SDA_2, SCL_2, 400000);
-//
-//  delay(5);
-//  I2Ctwo.beginTransmission(byte(0x36));
-//  I2Ctwo.write(byte(0x01));
-//  I2Ctwo.write(byte(0x00));
-//  I2Ctwo.endTransmission();
-//  delay(5);
-//  I2Ctwo.beginTransmission(byte(0x36));
-//  I2Ctwo.write(byte(0x02));
-//  I2Ctwo.write(byte(0x00));
-//  I2Ctwo.endTransmission();
-//  delay(5);
-//
-//  I2Ctwo.beginTransmission(byte(0x36));
-//  I2Ctwo.write(byte(0x03));
-//  I2Ctwo.write(byte(0x00));
-//  I2Ctwo.endTransmission();
-//  delay(5);
-//  I2Ctwo.beginTransmission(byte(0x36));
-//  I2Ctwo.write(byte(0x04));
-//  I2Ctwo.write(byte(0x00));
-//  I2Ctwo.endTransmission();
-//  delay(5);
-//
-//  I2Ctwo.beginTransmission(byte(0x36));
-//  I2Ctwo.write(byte(0x07));
-//  //  I2Ctwo.write(byte(0x23));
-//  I2Ctwo.write(byte(0x3F));
-//  I2Ctwo.endTransmission();
-//  delay(5);
-//
-//  I2Ctwo.beginTransmission(byte(0x36));
-//  I2Ctwo.write(byte(0x08));
-//  I2Ctwo.write(byte(0xE3));
-//  I2Ctwo.endTransmission();
-//  delay(5);
 }
 
 int AS5600_I2C_update_1()
@@ -269,7 +232,7 @@ void enc_motor_update()
   for (int i = 0; i < 2; i++)
   {
 
-    if (currAngle[i] < (prevAngle[i] - 200))
+    if (currAngle[i] < (prevAngle[i] - 500))
     {
       if (motorForward[i] == true)
       {
@@ -277,7 +240,7 @@ void enc_motor_update()
       }
     }
 
-    if (currAngle[i] > ( prevAngle[i] + 200))
+    if (currAngle[i] > ( prevAngle[i] + 500))
     {
       if (motorForward[i] == false)
       {
