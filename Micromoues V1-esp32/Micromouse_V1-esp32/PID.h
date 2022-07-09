@@ -11,19 +11,17 @@
 //Define Variables we'll be connecting to
 
 //Specify the links and initial tuning parameters
-PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 PID leftMotorVel(&InputRpmLeft, &OutputLeftMotor, &rpmSetLeft, Kp, Ki, Kd, DIRECT);
 PID rightMotorVel(&InputRpmRight, &OutputRightMotor, &rpmSetRight, Kp, Ki, Kd, DIRECT);
+
+PID turnPID(&turnInput, &turnOutput, &turnSetpoint, turnKp, turnKi, turnKd, DIRECT);
 
 void PID_setup()
 {
   //initialize the variables we're linked to
   //  Input = analogRead(PIN_INPUT);
-  Setpoint = 100;
+//  Setpoint = 100;
 
-  //turn the PID on
-  myPID.SetMode(AUTOMATIC);
-  
   leftMotorVel.SetMode(AUTOMATIC);
   leftMotorVel.SetSampleTime(1);
   leftMotorVel.SetOutputLimits(-255, 255);
@@ -31,11 +29,8 @@ void PID_setup()
   rightMotorVel.SetMode(AUTOMATIC);
   rightMotorVel.SetSampleTime(1);
   rightMotorVel.SetOutputLimits(-255, 255);
+  
+  turnPID.SetMode(AUTOMATIC);
+  turnPID.SetSampleTime(1);
+  turnPID.SetOutputLimits(-300, 300);  // turn speed
 }
-
-//void PID_loop()
-//{
-// Input = analogRead(PIN_INPUT);
-//  myPID.Compute();
-//  analogWrite(PIN_OUTPUT, Output);
-//}

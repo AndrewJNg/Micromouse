@@ -168,7 +168,7 @@ int AS5600_I2C_update_2()
   return value;
 }
 
-void enc_count_update()
+void enc_motor_update()
 {
   static double prevAngle[2] = {0, 0};
   static int multiplyAngle[2] = {0, 0};

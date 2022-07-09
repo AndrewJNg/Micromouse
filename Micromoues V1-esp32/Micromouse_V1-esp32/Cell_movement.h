@@ -27,7 +27,7 @@ void align_to_front_wall( int speedTol = 200, int targetReadingLeft = 4000, int 
 
     motor(leftSpeed, rightSpeed);
   } while ((millis() - saveMillis) < 1000);
-  motor(0,0);
+  motor(0, 0);
 }
 
 void move_forward_cells(int cellsNumber = 1)
@@ -44,7 +44,7 @@ void move_forward_cells(int cellsNumber = 1)
     motor(Speed - speedDiff, Speed + speedDiff);
     //      Start = false;
   } while ( (IRVal[0] < 2000 && IRVal[5] < 2000 ) && (IRVal[2] > 800 && IRVal[3] > 800));
-  motor(0,0);
+  motor(0, 0);
 }
 
 // accept angle to be turned (-90, 90, 180,270)
@@ -52,46 +52,37 @@ void turn(int  turnDegree)
 {
   double prevAngle;
   double targetAngle;
-//  int turnDegree;
-
   prevAngle =   MPU_Z_angle();
 
-//  turnDegree = rotation * 90;
-//  targetAngle = prevAngle + turnDegree - 5;
-  targetAngle= prevAngle + turnDegree;
+  targetAngle = prevAngle + turnDegree;
 
   unsigned long saveMillis = millis();
-//    while ( abs(gyroZ - targetAngle) > 3 && Start == true)
-    while ((millis() - saveMillis) < 3000)
-    {
-      int speedTol = 150;
-      double diff = targetAngle - gyroZ ;
-      if (diff < -60) diff = -60;
-      else if (diff > 60) diff = 60;
-      int Speed = map(diff, -60,60, -speedTol , speedTol );
-//      motor();
+  //    while ((millis() - saveMillis) < 3000)
+  //    {
+  //      int speedTol = 150;
+  //      double diff = targetAngle - gyroZ ;
+  //      if (diff < -60) diff = -60;
+  //      else if (diff > 60) diff = 60;
+  //      int Speed = map(diff, -60,60, -speedTol , speedTol );
+  ////      motor();
+  //    rpmMove(Speed, -Speed);
+  //      system();
+  //    }
+
+
+  //PID turnPID(&turnInput, &turnOutput, &turnSetpoint, turnKp, turnKi, turnKd, DIRECT);
+
+  while ((millis() - saveMillis) < 3000)
+  {
+    turnInput = MPU_Z_angle();
+    turnSetpoint =  targetAngle;
+    turnPID.SetTunings(turnKp, turnKi, turnKd);
+    turnPID.Compute();
+    int Speed = turnOutput;
     rpmMove(Speed, -Speed);
-      system();
-    }
-//  Setpoint = prevAngle + turnDegree;
+    OLED_display_stats();
+    system();
+  }
 
-//  do {
-//    Input = MPU_Z_angle()-Setpoint;
-//    myPID.SetOutputLimits(-255, 255);
-//    myPID.SetTunings(Kp, Ki, Kd);
-//    myPID.Compute();
-//    int Speed = Output;
-//    rpmMove(Output,-Output);
-    
-//    if(Speed >70) Speed =70;
-//    else if(Speed <-70) Speed =-70;
-//    motor(Speed, -Speed);
-//    system();
-//    OLED_display_stats();
-
-//  } while ((millis() - saveMillis) < 1000);
-  motor(0,0);
-
-//  motor(0, 0);
-//  delay(2000);
+  motor(0, 0);
 }

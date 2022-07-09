@@ -39,14 +39,14 @@ void notify()
     Start = false;
   }
 
-  if ( Ps3.event.button_down.triangle )Kp = Kp + 0.1;
-  if ( Ps3.event.button_down.cross )Kp = Kp - 0.1;
+  if ( Ps3.event.button_down.triangle )turnKp = turnKp + 0.1;
+  if ( Ps3.event.button_down.cross )turnKp = turnKp - 0.1;
 
-  if ( Ps3.event.button_down.right )Ki = Ki + 0.1;
-  if ( Ps3.event.button_down.left )Ki = Ki - 0.1;
+  if ( Ps3.event.button_down.right )turnKi = turnKi + 0.1;
+  if ( Ps3.event.button_down.left )turnKi = turnKi - 0.1;
 
-  if ( Ps3.event.button_down.circle )Kd = Kd + 0.01;
-  if ( Ps3.event.button_down.square )Kd = Kd - 0.01;
+  if ( Ps3.event.button_down.circle )turnKd = turnKd + 0.001;
+  if ( Ps3.event.button_down.square )turnKd = turnKd - 0.001;
 
 
   //---------------------- Battery events ---------------------

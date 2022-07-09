@@ -13,7 +13,10 @@ unsigned long StartTimer = 0;
 //double Kp = 1.8, Ki = 1.8, Kd = 0.12;
 //double Kp = 5, Ki = 4.5, Kd = 0.03;
 double Kp = 5, Ki = 5.1, Kd = 0.03;
-double Setpoint, Input, Output;
+
+double turnKp = 0.8, turnKi = 2.5, turnKd = 0.001;
+
+double turnSetpoint, turnInput, turnOutput;
 double rpmSetLeft, InputRpmLeft, OutputLeftMotor;
 double rpmSetRight, InputRpmRight, OutputRightMotor;
 
@@ -69,7 +72,7 @@ void loop() {
     if (Mode == 1)
     {
       OLED_display_stats();
-      float target_rpm = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), -255, 255, -900, 900);
+      float target_rpm = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), -255, 255, -300, 300);
       rpmMove(target_rpm, target_rpm);
 
     }
@@ -88,11 +91,8 @@ void loop() {
     }
     else if (Mode == 4)
     {
-      //       rpmMove(-20,20);
       turn(90);
       Start = false;
-
-
     }
   }
   else
