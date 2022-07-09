@@ -28,18 +28,26 @@ void notify()
   if ( Ps3.event.button_down.select ) Start = false;
   if ( Ps3.event.button_down.start ) Start = true;
   //        Serial.println("Started pressing the select button");
-  if ( Ps3.event.button_down.up )Mode++;
-  if ( Ps3.event.button_down.down )Mode--;
+  if ( Ps3.event.button_down.up )
+  {
+    Mode++;
+    Start = false;
+  }
+  if ( Ps3.event.button_down.down )
+  {
+    Mode--;
+    Start = false;
+  }
 
-  if ( Ps3.event.button_down.triangle )Kp = Kp+0.1;
-  if ( Ps3.event.button_down.cross )Kp=Kp-0.1;
-  
-  if ( Ps3.event.button_down.right )Ki = Ki+0.1;
-  if ( Ps3.event.button_down.left )Ki=Ki-0.1;
-  
-  if ( Ps3.event.button_down.circle )Kd = Kd+0.01;
-  if ( Ps3.event.button_down.square )Kd=Kd-0.01;
-  
+  if ( Ps3.event.button_down.triangle )Kp = Kp + 0.1;
+  if ( Ps3.event.button_down.cross )Kp = Kp - 0.1;
+
+  if ( Ps3.event.button_down.right )Ki = Ki + 0.1;
+  if ( Ps3.event.button_down.left )Ki = Ki - 0.1;
+
+  if ( Ps3.event.button_down.circle )Kd = Kd + 0.01;
+  if ( Ps3.event.button_down.square )Kd = Kd - 0.01;
+
 
   //---------------------- Battery events ---------------------
   if ( battery != Ps3.data.status.battery ) {
@@ -56,7 +64,7 @@ void notify()
 }
 
 void onConnect() {
-//  Serial.println("Connected.");
+  //  Serial.println("Connected.");
 }
 
 float PS3_LeftAnalogStickAngle (int LX, int LY)

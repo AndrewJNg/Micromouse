@@ -171,26 +171,64 @@ int AS5600_I2C_update_2()
 
 //unsigned long enc_menu_prevMillis = 0;
 
-void enc_menu_update()
+//void enc_menu_update()
+//{
+//  static double prevAngle[2] = {0, 0};
+//  static int multiplyAngle[2] = {0, 0};
+//
+//  currAngle[0] = AS5600_I2C_update_1();
+//  currAngle[1] = AS5600_I2C_update_2();
+//  for (int i = 0; i < 2; i++)
+//  {
+//    if ((prevAngle[i] > 3072 && prevAngle[i]  < 4096  ) && ( currAngle[i]  >  0 &&  currAngle[i]  < 1024 )  ) multiplyAngle[i]++;
+//    else if ((prevAngle[i]  >  0 &&  prevAngle[i]  < 1024 ) && (currAngle[i]  > 3072 && currAngle[i]  < 4096)  ) multiplyAngle[i]--;
+//    prevAngle[i]  = currAngle[i] ;
+//
+//    currAngle[i]  = currAngle[i]  + multiplyAngle[i]  * 4096;
+//  }
+//
+//}
+
+
+
+void enc_motor_update()
 {
+//  static double prevAngle[2] = {0, 0};
+//  static int multiplyAngle[2] = {0, 0};
+//
+//  currAngle[0] = AS5600_I2C_update_1();
+//  currAngle[1] = AS5600_I2C_update_2();
+//
+//  for (int i = 0; i < 2; i++)
+//  {
+//
+//    if (currAngle[i] < (prevAngle[i] - 500))
+//    {
+//      if (motorForward[i] == true)
+//      {
+//        multiplyAngle[i]++;
+//      }
+//    }
+//
+//    if (currAngle[i] > ( prevAngle[i] + 500))
+//    {
+//      if (motorForward[i] == false)
+//      {
+//        multiplyAngle[i]--;
+//      }
+//
+//    }
+//    prevAngle[i]  = currAngle[i] ;
+//    currAngle[i]  = currAngle[i]  + multiplyAngle[i]  * 4096;
+//  }
+
   static double prevAngle[2] = {0, 0};
   static int multiplyAngle[2] = {0, 0};
 
-  //  currAngle[0] = ((double) map(AS5600_I2C_update_1(), 0, 4095, -18000, 18000) / 100);
-  //  currAngle[1] = ((double) map(AS5600_I2C_update_2(), 0, 4095, -18000, 18000) / 100);
   currAngle[0] = AS5600_I2C_update_1();
   currAngle[1] = AS5600_I2C_update_2();
-  //Serial.print(currAngle[0]);
-  //Serial.print("   ");
-  //Serial.print(currAngle[1]);
-  //Serial.print("   ");
   for (int i = 0; i < 2; i++)
   {
-    //    if ((prevAngle[i] > 90 && prevAngle[i]  < 180  ) && ( currAngle[i]  > -180 &&  currAngle[i]  < -90)  ) multiplyAngle[i]++;
-    //    else if ((prevAngle[i]  > -180 &&  prevAngle[i]  < -90) && (currAngle[i]  > 90 && currAngle[i]  < 180)  ) multiplyAngle[i]--;
-    //    prevAngle[i]  = currAngle[i] ;
-    //
-    //    currAngle[i]  = currAngle[i]  + multiplyAngle[i]  * 360;
     //    0 = -180
     //    1024 = -90
     //    2048 = 0
@@ -198,120 +236,70 @@ void enc_menu_update()
     //    4096 = 180
     //    if ((prevAngle[i] > 2560 && prevAngle[i]  < 4096  ) && ( currAngle[i]  >  0 &&  currAngle[i]  < 1536 )  ) multiplyAngle[i]++;
     //    else if ((prevAngle[i]  >  0 &&  prevAngle[i]  < 1536 ) && (currAngle[i]  > 2560 && currAngle[i]  < 4096)  ) multiplyAngle[i]--;
-    if ((prevAngle[i] > 3072 && prevAngle[i]  < 4096  ) && ( currAngle[i]  >  0 &&  currAngle[i]  < 1024 )  ) multiplyAngle[i]++;
-    else if ((prevAngle[i]  >  0 &&  prevAngle[i]  < 1024 ) && (currAngle[i]  > 3072 && currAngle[i]  < 4096)  ) multiplyAngle[i]--;
+    if ((prevAngle[i] >= 3072 && prevAngle[i]  <= 4096  ) && ( currAngle[i]  >=  0 &&  currAngle[i]  <= 1024 )  ) multiplyAngle[i]++;
+    else if ((prevAngle[i]  >=  0 &&  prevAngle[i]  <= 1024 ) && (currAngle[i]  >= 3072 && currAngle[i]  <= 4096)  ) multiplyAngle[i]--;
     prevAngle[i]  = currAngle[i] ;
 
     currAngle[i]  = currAngle[i]  + multiplyAngle[i]  * 4096;
   }
 
-  //Serial.print(currAngle[0]);
-  //Serial.print("   ");
-  //Serial.print(currAngle[1]);
-  //Serial.println("   ");
 }
 
-
-
-void enc_motor_update()
-{
-  //  static unsigned long prevMillis = 0;
-  //  prevMillis = micros();
-  //  Serial.print("encoder:");
-  //  Serial.print(micros()-prevMillis);
-
-
-  static double prevAngle[2] = {0, 0};
-  static int multiplyAngle[2] = {0, 0};
-
-  //  currAngle[0] = ((double) map(AS5600_I2C_update_1(), 0, 4095, -18000, 18000) / 100);
-  //  currAngle[1] = ((double) map(AS5600_I2C_update_2(), 0, 4095, -18000, 18000) / 100);
-  currAngle[0] = AS5600_I2C_update_1();
-  currAngle[1] = AS5600_I2C_update_2();
-
-  for (int i = 0; i < 2; i++)
-  {
-
-    if (currAngle[i] < (prevAngle[i] - 500))
-    {
-      if (motorForward[i] == true)
-      {
-        multiplyAngle[i]++;
-      }
-    }
-
-    if (currAngle[i] > ( prevAngle[i] + 500))
-    {
-      if (motorForward[i] == false)
-      {
-        multiplyAngle[i]--;
-      }
-
-    }
-    prevAngle[i]  = currAngle[i] ;
-    currAngle[i]  = currAngle[i]  + multiplyAngle[i]  * 4096;
-  }
-
-  //  Serial.print("encoder:");
-  //  Serial.print(micros()-prevMillis);
-
-}
-
-double encDistance(int returnNum)
-{
-//  static double Init[2] = {0, 0};
-//  if (Reset == true)
+//double encDistance(int returnNum)
+//{
+////  static double Init[2] = {0, 0};
+////  if (Reset == true)
+////  {
+////    Init[0] = currAngle[0];
+////    Init[1] = currAngle[1];
+////  }
+//  const float radius = 17; //34mm in diameter
+//  const float pi = 3.142;
+//
+//  double degree[2] = {0, 0};
+//  double distance[2] = {0, 0};
+//  //  enc_motor_update();
+//
+//
+//  degree[0] = (double)currAngle[0] * 360 / 4096;
+//  degree[1] = (double)currAngle[1] * 360 / 4096;
+//
+//
+//  distance[0] = (2 * pi * radius * degree[0]) / 360;
+//  distance[1] = (2 * pi * radius * degree[1]) / 360;
+//  //Serial.print(degree[0]);
+//  //Serial.print("  ");
+//  //Serial.println(distance);
+//  return distance[returnNum];
+////  return distance[returnNum] - Init[returnNum];
+//
+//
+//}
+//
+//double encSpeed(int returnNum)
+//{
+//  static unsigned long prevMillis[2] = {0, 0};
+//  static double prevDistance[2] = {0, 0};
+//  static double Speed[2] = {0, 0};
+//
+//  enc_motor_update();
+//
+//  double currDistance = encDistance(returnNum);
+//  double diff =   currDistance - prevDistance[returnNum];
+//
+//  if (abs(diff) > 0)
 //  {
-//    Init[0] = currAngle[0];
-//    Init[1] = currAngle[1];
+//    prevDistance[returnNum] =  currDistance;
+//    //      Serial.print("diff: ");
+//    //      Serial.print(diff);
+//
+//    //      Serial.print(" time: ");
+//    //      Serial.print(millis() - prevMillis[returnNum]);
+//    Speed[returnNum] = (diff * 1000) / ((millis() - prevMillis[returnNum])); // * 100;
+//
+//    //      Serial.print(" speed: ");
+//    //      Serial.println(Speed[returnNum]);
+//    prevMillis[returnNum] = millis();
 //  }
-  const float radius = 17; //34mm in diameter
-  const float pi = 3.142;
-
-  double degree[2] = {0, 0};
-  double distance[2] = {0, 0};
-  //  enc_motor_update();
-
-
-  degree[0] = (double)currAngle[0] * 360 / 4096;
-  degree[1] = (double)currAngle[1] * 360 / 4096;
-
-
-  distance[0] = (2 * pi * radius * degree[0]) / 360;
-  distance[1] = (2 * pi * radius * degree[1]) / 360;
-  //Serial.print(degree[0]);
-  //Serial.print("  ");
-  //Serial.println(distance);
-  return distance[returnNum];
-//  return distance[returnNum] - Init[returnNum];
-
-
-}
-
-double encSpeed(int returnNum)
-{
-  static unsigned long prevMillis[2] = {0, 0};
-  static double prevDistance[2] = {0, 0};
-  static double Speed[2] = {0, 0};
-
-  enc_motor_update();
-
-  double currDistance = encDistance(returnNum);
-  double diff =   currDistance - prevDistance[returnNum];
-
-  if (abs(diff) > 0)
-  {
-    prevDistance[returnNum] =  currDistance;
-    //      Serial.print("diff: ");
-    //      Serial.print(diff);
-
-    //      Serial.print(" time: ");
-    //      Serial.print(millis() - prevMillis[returnNum]);
-    Speed[returnNum] = (diff * 1000) / ((millis() - prevMillis[returnNum])); // * 100;
-
-    //      Serial.print(" speed: ");
-    //      Serial.println(Speed[returnNum]);
-    prevMillis[returnNum] = millis();
-  }
-  return Speed[returnNum];
-}
+//  return Speed[returnNum];
+//}

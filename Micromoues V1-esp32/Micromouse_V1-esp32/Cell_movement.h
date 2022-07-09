@@ -58,38 +58,42 @@ void turn(int rotation)
   double targetAngle;
   int turnDegree;
 
-//  prevAngle =   MPU_Z_angle();
-//
-//  turnDegree = rotation * 90;
-//  targetAngle = prevAngle + turnDegree - 5;
+  prevAngle =   MPU_Z_angle();
+
+  turnDegree = rotation * 90;
+  targetAngle = prevAngle + turnDegree - 5;
 
 
   unsigned long saveMillis = millis();
-  //  while ( abs(gyroZ - targetAngle) > 3 && Start == true)
-  //  {
-  //    int speedTol = 300;
-  //    double diff = targetAngle - gyroZ ;
-  //    if (diff < -90) diff = -90;
-  //    else if (diff > 90) diff = 90;
-  //    int Speed = map(diff, -90, 90, -speedTol , speedTol );
-  //    motor(Speed, -Speed);
-  //    system();
-  //  }
+//    while ( abs(gyroZ - targetAngle) > 3 && Start == true)
+    while ((millis() - saveMillis) < 3000)
+    {
+      int speedTol = 200;
+      double diff = targetAngle - gyroZ ;
+      if (diff < -60) diff = -60;
+      else if (diff > 60) diff = 60;
+      int Speed = map(diff, -60,60, -speedTol , speedTol );
+//      motor();
+    rpmMove(Speed, -Speed);
+      system();
+    }
 //  Setpoint = prevAngle + turnDegree;
 
-  do {
-    Input = MPU_Z_angle()-Setpoint;
-    myPID.SetOutputLimits(-255, 255);
-    myPID.SetTunings(Kp, Ki, Kd);
-    myPID.Compute();
-    int Speed = Output;
-    if(Speed >70) Speed =70;
-    else if(Speed <-70) Speed =-70;
-    motor(Speed, -Speed);
-    system();
-    OLED_display_stats();
+//  do {
+//    Input = MPU_Z_angle()-Setpoint;
+//    myPID.SetOutputLimits(-255, 255);
+//    myPID.SetTunings(Kp, Ki, Kd);
+//    myPID.Compute();
+//    int Speed = Output;
+//    rpmMove(Output,-Output);
+    
+//    if(Speed >70) Speed =70;
+//    else if(Speed <-70) Speed =-70;
+//    motor(Speed, -Speed);
+//    system();
+//    OLED_display_stats();
 
-  } while ((millis() - saveMillis) < 1000);
+//  } while ((millis() - saveMillis) < 1000);
   motor(0,0);
 
 //  motor(0, 0);

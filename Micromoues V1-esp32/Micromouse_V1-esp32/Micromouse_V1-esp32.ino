@@ -33,22 +33,31 @@ double rpmSetRight, InputRpmRight, OutputRightMotor;
 #include "Cell_movement.h"
 
 
+//TaskHandle_t SecondCoreAllocation;
 
 void setup() {
-  Serial.begin(115200);
+    Serial.begin(115200);
   Motor_setup();
   OLED_setup();
 
   IR_setup();
   Enc_setup();
-  //  Gyro_setup();
+  Gyro_setup();
 
   PS3_setup();
 
   PID_setup();
 
+  //create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
+  //  xTaskCreatePinnedToCore(
+  //                    Core0,   /* Task function. */
+  //                    "Task1",     /* name of task. */
+  //                    10000,       /* Stack size of task */
+  //                    NULL,        /* parameter of the task */
+  //                    1,           /* priority of the task */
+  //                    &SecondCoreCode,      /* Task handle to keep track of created task */
+  //                    0);          /* pin task to core 0 */
 }
-
 
 
 
@@ -61,19 +70,19 @@ void loop() {
     {
 
       float target_rpm = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), -255, 255, -300, 300);
-       rpmMove(target_rpm,target_rpm);
+      rpmMove(target_rpm, target_rpm);
       //      OLED_display_stats();
       //      system();
       //OLED_display_stats();
-//        Serial.println(1);
+      //        Serial.println(xPortGetCoreID());
 
     }
     else if (Mode == 2)
     {
-      
+
 
       float target_rpm = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), -255, 255, -300, 300);
-       rpmMove(-target_rpm,target_rpm);
+      rpmMove(-target_rpm, target_rpm);
       //      OLED_display_stats();
       //      system();
       //      motor(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
@@ -89,23 +98,23 @@ void loop() {
       //      prevMicro = micros();
       //      }
 
-      
-//      move_forward_cells();
-//      align_to_front_wall();
-//
-//      delay(100);
-//      system();
-//      Setpoint = MPU_Z_angle() + 90;
-//      turn(1);
-//
-//      align_to_front_wall();
-//
-//      delay(100);
-//      system();
-//      Setpoint = MPU_Z_angle() + 90;
-//      turn(1);
-//      move_forward_cells();
-//      Start = false;
+
+      //      move_forward_cells();
+      //      align_to_front_wall();
+      //
+      //      delay(100);
+      //      system();
+      //      Setpoint = MPU_Z_angle() + 90;
+      //      turn(1);
+      //
+      //      align_to_front_wall();
+      //
+      //      delay(100);
+      //      system();
+      //      Setpoint = MPU_Z_angle() + 90;
+      //      turn(1);
+      //      move_forward_cells();
+      //      Start = false;
     }
     else if (Mode == 3)
     {
@@ -114,6 +123,10 @@ void loop() {
     }
     else if (Mode == 4)
     {
+      //       rpmMove(-20,20);
+      turn(1);
+      Start = false;
+
 
     }
   }
@@ -133,6 +146,21 @@ void loop() {
 void system()
 {
   //system functions, important to keep different time sensitive functions working
-//  IR_update();
-  //  Gyro_update();
+  //  IR_update();
+//  Gyro_update();
 }
+//Task1code: blinks an LED every 1000 ms
+//void SecondCoreCode( void * pvParameters ){
+//  //Setup
+//  Serial.print("Task1 running on core ");
+//  Serial.println(xPortGetCoreID());
+//
+//
+//// loop function
+//  for(;;){
+////    digitalWrite(2, HIGH);
+////    delay(1000);
+////    digitalWrite(2, LOW);
+////    delay(1000);
+//  }
+//}
