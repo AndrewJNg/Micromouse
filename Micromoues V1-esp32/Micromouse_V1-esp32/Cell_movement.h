@@ -4,8 +4,6 @@ void align_to_front_wall( int speedTol = 200, int targetReadingLeft = 4000, int 
   saveMillis = millis();
   int diffL = 0;
   int diffR = 0;
-  //  do
-  //  {
   do {
     system();
     diffL = targetReadingLeft - IRVal[0] ;
@@ -30,7 +28,6 @@ void align_to_front_wall( int speedTol = 200, int targetReadingLeft = 4000, int 
     motor(leftSpeed, rightSpeed);
   } while ((millis() - saveMillis) < 1000);
   motor(0,0);
-  //  } while (abs(diffR + diffL) > 500);
 }
 
 void move_forward_cells(int cellsNumber = 1)
@@ -50,11 +47,9 @@ void move_forward_cells(int cellsNumber = 1)
   motor(0,0);
 }
 
-
-//void turn(int rotation)
+// accept angle to be turned (-90, 90, 180,270)
 void turn(int  turnDegree)
 {
-  //  rotation = -1(turn Left) /1(turn Right) / 2 (turn 180 )
   double prevAngle;
   double targetAngle;
 //  int turnDegree;
