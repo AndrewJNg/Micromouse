@@ -36,7 +36,7 @@ double rpmSetRight, InputRpmRight, OutputRightMotor;
 //TaskHandle_t SecondCoreAllocation;
 
 void setup() {
-    Serial.begin(115200);
+  Serial.begin(115200);
   Motor_setup();
   OLED_setup();
 
@@ -68,53 +68,18 @@ void loop() {
   {
     if (Mode == 1)
     {
-
-      float target_rpm = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), -255, 255, -300, 300);
+      OLED_display_stats();
+      float target_rpm = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), -255, 255, -900, 900);
       rpmMove(target_rpm, target_rpm);
-      //      OLED_display_stats();
-      //      system();
-      //OLED_display_stats();
-      //        Serial.println(xPortGetCoreID());
 
     }
     else if (Mode == 2)
     {
 
 
+      OLED_display_stats();
       float target_rpm = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), -255, 255, -300, 300);
       rpmMove(-target_rpm, target_rpm);
-      //      OLED_display_stats();
-      //      system();
-      //      motor(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
-      //
-      //      if(currAngle[1]!=prevCount)
-      //      {
-      //
-      //      Serial.print(currAngle[1]-prevCount);
-      //      Serial.print("  ");
-      //      Serial.println(micros()-prevMicro);
-      //
-      //      prevCount = currAngle[1];
-      //      prevMicro = micros();
-      //      }
-
-
-      //      move_forward_cells();
-      //      align_to_front_wall();
-      //
-      //      delay(100);
-      //      system();
-      //      Setpoint = MPU_Z_angle() + 90;
-      //      turn(1);
-      //
-      //      align_to_front_wall();
-      //
-      //      delay(100);
-      //      system();
-      //      Setpoint = MPU_Z_angle() + 90;
-      //      turn(1);
-      //      move_forward_cells();
-      //      Start = false;
     }
     else if (Mode == 3)
     {
@@ -124,7 +89,7 @@ void loop() {
     else if (Mode == 4)
     {
       //       rpmMove(-20,20);
-      turn(1);
+      turn(90);
       Start = false;
 
 
@@ -146,8 +111,8 @@ void loop() {
 void system()
 {
   //system functions, important to keep different time sensitive functions working
-  //  IR_update();
-//  Gyro_update();
+  IR_update();
+  Gyro_update();
 }
 //Task1code: blinks an LED every 1000 ms
 //void SecondCoreCode( void * pvParameters ){

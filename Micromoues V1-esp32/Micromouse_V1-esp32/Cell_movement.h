@@ -51,24 +51,25 @@ void move_forward_cells(int cellsNumber = 1)
 }
 
 
-void turn(int rotation)
+//void turn(int rotation)
+void turn(int  turnDegree)
 {
   //  rotation = -1(turn Left) /1(turn Right) / 2 (turn 180 )
   double prevAngle;
   double targetAngle;
-  int turnDegree;
+//  int turnDegree;
 
   prevAngle =   MPU_Z_angle();
 
-  turnDegree = rotation * 90;
-  targetAngle = prevAngle + turnDegree - 5;
-
+//  turnDegree = rotation * 90;
+//  targetAngle = prevAngle + turnDegree - 5;
+  targetAngle= prevAngle + turnDegree;
 
   unsigned long saveMillis = millis();
 //    while ( abs(gyroZ - targetAngle) > 3 && Start == true)
     while ((millis() - saveMillis) < 3000)
     {
-      int speedTol = 200;
+      int speedTol = 150;
       double diff = targetAngle - gyroZ ;
       if (diff < -60) diff = -60;
       else if (diff > 60) diff = 60;

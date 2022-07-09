@@ -24,18 +24,8 @@ void motor(int speedLeft, int speedRight)
   else if (speedLeft < -255) speedLeft = -255;
   if (speedRight > 255) speedRight = 255;
   else if (speedRight < -255) speedRight = -255;
+  
   // invert motors when needed
-  if (speedLeft > 0)
-    motorForward[0] = true;
-  else if (speedLeft < 0)
-    motorForward[0] = false;
-
-  if (speedRight > 0)
-    motorForward[1] = true;
-  else if (speedRight < 0)
-    motorForward[1] = false;
-
-
   int Speed[2] = { -speedLeft, -speedRight};
 
   // for loop to run each motors individually
@@ -65,7 +55,6 @@ void motor(int speedLeft, int speedRight)
     }
 
   }
-//  enc_motor_update();
 
 }
 
