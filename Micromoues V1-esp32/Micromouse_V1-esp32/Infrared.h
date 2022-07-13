@@ -33,7 +33,7 @@ void IR_update()
 //      int initialVal  = analogRead(IRRecPin[x]);
       digitalWrite(IREmitPin[x], HIGH);
       
-      delayMicroseconds(200);
+      delayMicroseconds(500);
       
 //      IRVal[x]  = analogRead(IRRecPin[x])- initialVal;
       IRVal[x]  = analogRead(IRRecPin[x]);

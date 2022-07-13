@@ -208,15 +208,15 @@ void OLED_menu_display()
     }
     else if (Mode == 3)
     {
+      OLED.drawBitmap(22, 35, Calibrate_Logo, 106, 30, 1);
+    }
+    else if (Mode == 4)
+    {
       OLED.setTextSize(2);
       OLED.setCursor(30, 20);
       OLED.println("PS3");
       OLED.setCursor(30, 40);
       OLED.print("controls");
-    }
-    else if (Mode == 4)
-    {
-      OLED.drawBitmap(22, 35, Calibrate_Logo, 106, 30, 1);
     }
   }
   OLED.display(); //update the display
@@ -336,20 +336,20 @@ void OLED_display_stats()
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // IR
-//    OLED.print("IRFront:  ");
-//    OLED.print(IRVal[0]);
-//    OLED.print("  ");
-//    OLED.println(IRVal[5]);
-//
-//    OLED.print("IR45:     ");
-//    OLED.print(IRVal[1] );
-//    OLED.print("  ");
-//    OLED.println(IRVal[4] );
-//
-//    OLED.print("IRSide:   ");
-//    OLED.print(IRVal[2]);
-//    OLED.print("  ");
-//    OLED.println(IRVal[3]);
+    OLED.print("IRFront:  ");
+    OLED.print(IRVal[0]);
+    OLED.print("  ");
+    OLED.println(IRVal[5]);
+
+    OLED.print("IR45:     ");
+    OLED.print(IRVal[1] );
+    OLED.print("  ");
+    OLED.println(IRVal[4] );
+
+    OLED.print("IRSide:   ");
+    OLED.print(IRVal[2]);
+    OLED.print("  ");
+    OLED.println(IRVal[3]);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Gyro
@@ -372,7 +372,15 @@ void OLED_display_stats()
     OLED.println(turnKi,5);
     OLED.print("D: ");
     OLED.println(turnKd,5);
-    
+    /*
+     
+    OLED.print("P: ");
+    OLED.println(straightKp,5);
+    OLED.print("I: ");
+    OLED.println(straightKi,5);
+    OLED.print("D: ");
+    OLED.println(straightKd,5);
+     */
 //    OLED.print("P: ");
 //    OLED.println(Kp);
 //    OLED.print("I: ");

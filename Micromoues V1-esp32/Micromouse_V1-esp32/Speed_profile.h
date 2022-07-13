@@ -34,7 +34,7 @@ void rpmMove(float target_rpm_left, float target_rpm_right)
     v1Prev = v1;
 
     float v2 = rpmRight;
-    v2Filt = 0.98751209 * v2Filt + 0.00624395 * v2 + 0.00624395 * v2Prev;;
+    v2Filt = 0.98751209 * v2Filt + 0.00624395 * v2 + 0.00624395 * v2Prev;
     v2Prev = v2;
 
     InputRpmLeft = v1Filt;
@@ -52,18 +52,100 @@ void rpmMove(float target_rpm_left, float target_rpm_right)
 
     motor(SpeedLeft, SpeedRight);
 
-    Serial.print(v1Filt, 0);
-    Serial.print("  ");
-    Serial.print(v2Filt, 0);
-    Serial.print("  ");
-    Serial.print(target_rpm_left, 0);
-    Serial.print("  ");
-    Serial.print(target_rpm_right, 0);
-    Serial.print("  ");
-    Serial.print(0, 0);
-    Serial.print("  ");
-    Serial.print(900, 0);
-    Serial.println();
+    //    Serial.print(v1Filt, 0);
+    //    Serial.print("  ");
+    //    Serial.print(v2Filt, 0);
+    //    Serial.print("  ");
+    //    Serial.print(target_rpm_left, 0);
+    //    Serial.print("  ");
+    //    Serial.print(target_rpm_right, 0);
+    //    Serial.print("  ");
+    //    Serial.print(0, 0);
+    //    Serial.print("  ");
+    //    Serial.print(900, 0);
+    //    Serial.println();
 
   }
+}
+
+void straight(int Speed, long targetDistance)
+{
+  double initLeftDist = encDistance(0);
+  double initRightDist = encDistance(1);
+  double currLeftDist = 0;
+  double currRightDist = 0;
+
+  //  Serial.print(initLeftDist);
+  //  Serial.print("  ");
+  //  Serial.print(initRightDist );
+  //  Serial.print("  ");
+  //  Serial.print(currLeftDist);
+  //  Serial.print("  ");
+  //  Serial.print(currRightDist);
+  //  error_old = 0;
+
+  currLeftDist = encDistance(0) - initLeftDist;
+  currRightDist = encDistance(1) - initRightDist;
+
+
+  while ((((currLeftDist + currRightDist) / 2) < targetDistance) && Start == true && ( IRVal[0] < 3500 &&  IRVal[5] < 3500))
+  {
+    // both walls are present
+    if (IRVal[2] >= 1000 && IRVal[3] >= 1000)
+    {
+      system();
+      //    int diff = IRVal[4] - IRVal[1];
+      int diff = (leftWall - IRVal[2]) +  (IRVal[3] - rightWall);
+      //      int diff = (IRVal[3] -rightWall)- (leftWall - IRVal[2]);
+      if ( diff < -1500)  diff = -1500;
+      else if ( diff > 1500)  diff = 1500;
+      int speedDiff = map(diff, -1500, 1500, -70 , 70);
+      int Speed = 100;
+      motor(Speed - speedDiff, Speed + speedDiff);
+    }
+    else if (IRVal[2] >= 1000 && IRVal[3] < 1000)
+    {
+      system();
+      //    int diff = IRVal[4] - IRVal[1];
+      int diff = (leftWall - IRVal[2]) ;
+//      int diff = (leftWall - IRVal[2]) +  (IRVal[3] - rightWall);
+      //      int diff = (IRVal[3] -rightWall)- (leftWall - IRVal[2]);
+      if ( diff < -1500)  diff = -1500;
+      else if ( diff > 1500)  diff = 1500;
+      int speedDiff = map(diff, -1500, 1500, -70 , 70);
+      int Speed = 100;
+      motor(Speed - speedDiff, Speed + speedDiff);
+    }
+    else if (IRVal[2] < 1000 && IRVal[3] >= 1000)
+    {
+      system();
+      //    int diff = IRVal[4] - IRVal[1];
+      int diff = (IRVal[3] - rightWall);
+//      int diff = (leftWall - IRVal[2]) +  (IRVal[3] - rightWall);
+      //      int diff = (IRVal[3] -rightWall)- (leftWall - IRVal[2]);
+      if ( diff < -1500)  diff = -1500;
+      else if ( diff > 1500)  diff = 1500;
+      int speedDiff = map(diff, -1500, 1500, -70 , 70);
+      int Speed = 100;
+      motor(Speed - speedDiff, Speed + speedDiff);
+    }
+    else
+    {
+      //    double error =  currLeftDist - currRightDist ;
+      //    double corr_value =  kp * error  + kd * (error - error_old); //PD control
+      //    error_old = error;
+
+      straightInput =  currRightDist - currLeftDist ;
+      straightSetpoint =  0;
+      straightPID.SetTunings(straightKp, straightKi, straightKd);
+      straightPID.Compute();
+      int corr_value = straightOutput;
+      //    rpmMove(Speed, -Speed);
+
+      //    rpmMove(Speed - corr_value, Speed + corr_value);
+      motor(Speed - corr_value, Speed + corr_value);
+      system();
+    }
+  }
+
 }
