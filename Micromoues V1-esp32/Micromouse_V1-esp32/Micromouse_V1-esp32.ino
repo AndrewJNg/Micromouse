@@ -38,7 +38,7 @@ int rightWall = 1456;
 #include "Cell_movement.h"
 #include "PS3.h"
 
-#include "User_interface.h" 
+#include "User_interface.h"
 #include "OLED.h"
 
 #include "FloodFill.h"
@@ -47,7 +47,7 @@ int rightWall = 1456;
 //TaskHandle_t SecondCoreAllocation;
 
 void setup() {
-  Serial.begin(115200);
+  //  Serial.begin(115200);
   Motor_setup();
   OLED_setup();
 
@@ -58,7 +58,6 @@ void setup() {
   PS3_setup();
 
   PID_setup();
-  //  delay(1000);
   FloodFill_setup();
 
   //create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
@@ -80,119 +79,28 @@ void loop() {
   if (Start)
   {
     if (Mode == 1)
-    {
-      //      OLED_display_stats();
-      //      turn(-90);
+    { // First search for new map
+      clearMap();
       printMap() ;
-      //      OLED_display_stats();
-      //      turn(180);
-      //      first_Search();
-      flood_fill(0, 0, 1);
-      printMap() ;
-      //      OLED_display_stats();
-      //      float target_rpm = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), -255, 255, -300, 300);
-      //      rpmMove(target_rpm, target_rpm);
-      //      move_forward_cells();
-      //      align_to_front_wall();
-      //      turn(-180);
-      //      move_forward_cells();
+      first_Search();
       Start = false;
     }
     else if (Mode == 2)
-    {
+    {  // Reserved for Speed Run
       printMap() ;
-      //      OLED_display_stats();
-      //      move_forward_cells();
-      //     move_forward_cells();
-      //      align_to_front_wall();
-      //      float target_rpm = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), -255, 255, -300, 300);
-      //      rpmMove(-target_rpm, target_rpm);
+  straight(100, 180 * 1);
+      
       Start = false;
     }
     else if (Mode == 3)
-    {
+    { // Calibrate
       //      OLED_display_stats();
-      scan();
+      //      Start = false;
       printMap() ;
-      move_forward_cells();
-      curr_Y_coor++;
-      curr_dir = 0  ;
-
-      scan();
-      printMap() ;
-      turn(90);
-      curr_dir = 1  ;
-
-      scan();
-      printMap() ;
-      move_forward_cells();
-      curr_X_coor++;
-      curr_dir = 1  ;
-
-      scan();
-      printMap() ;
-      turn(90);
-      curr_dir = 2 ;
-
-      scan();
-      printMap() ;
-      move_forward_cells();
-      curr_Y_coor--;
-      curr_dir = 2  ;
-
-      scan();
-      printMap() ;
-      turn(90);
-      curr_dir = 3  ;
-
-      scan();
-      printMap() ;
-      turn(90);
-      curr_dir = 0  ;
-
-      scan();
-      printMap() ;
-      move_forward_cells();
-      curr_Y_coor++;
-      curr_dir = 0  ;
-
-      scan();
-      printMap() ;
-      turn(-90);
-      curr_dir = 3  ;
-
-      scan();
-      printMap() ;
-      move_forward_cells();
-      curr_X_coor--;
-      curr_dir = 3  ;
-
-      scan();
-      printMap() ;
-      turn(-90);
-      curr_dir = 2  ;
-
-      scan();
-      printMap() ;
-      move_forward_cells();
-      curr_Y_coor--;
-      curr_dir = 2  ;
-
-      scan();
-      printMap() ;
-      turn(-90);
-      curr_dir = 1  ;
-
-      scan();
-      printMap() ;
-      turn(-90);
-      curr_dir = 0  ;
-      Start = false;
     }
     else if (Mode == 4)
-    {
-      printMap() ;
-      //      OLED_display_stats();
+    { // PS3 movement
+      OLED_display_stats();
       motor(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
     }
   }

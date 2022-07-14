@@ -34,10 +34,10 @@ void align_to_front_wall( int speedTol = 100, int targetReadingLeft = 4000, int 
 void move_forward_cells(int cellsNumber = 1)
 {
 
-  straight(100, 180 * cellsNumber);
+  straight(100, 160 * cellsNumber);
   motor(0,0);
 //  delay(100);
-  if ( IRVal[0] >=3500 ||  IRVal[5] >= 3500)
+  if ( IRVal[0] >=2000 ||  IRVal[5] >= 2000)
   {
     align_to_front_wall();
   }
@@ -78,7 +78,7 @@ void turn(int  turnDegree)
   while ( abs(gyroZ - targetAngle) > 3 && Start == true && ((millis()-saveMillis)<3000))
   {
     //      int speedTol = 300;
-    int speedTol = 80;
+    int speedTol = 100;
     double diff = targetAngle - gyroZ ;
     if (diff < -40) diff = -40;
     else if (diff > 40) diff = 40;

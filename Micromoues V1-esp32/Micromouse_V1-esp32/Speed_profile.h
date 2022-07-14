@@ -90,8 +90,12 @@ void straight(int Speed, long targetDistance)
 
   while ((((currLeftDist + currRightDist) / 2) < targetDistance) && Start == true && ( IRVal[0] < 3500 &&  IRVal[5] < 3500))
   {
+  currLeftDist = encDistance(0) - initLeftDist;
+  currRightDist = encDistance(1) - initRightDist;
+    
+    
     // both walls are present
-    if (IRVal[2] >= 1000 && IRVal[3] >= 1000)
+    if (IRVal[2] >= 1500 && IRVal[3] >= 1500)
     {
       system();
       //    int diff = IRVal[4] - IRVal[1];
@@ -103,7 +107,7 @@ void straight(int Speed, long targetDistance)
       int Speed = 100;
       motor(Speed - speedDiff, Speed + speedDiff);
     }
-    else if (IRVal[2] >= 1000 && IRVal[3] < 1000)
+    else if (IRVal[2] >= 1500 && IRVal[3] < 1500)
     {
       system();
       //    int diff = IRVal[4] - IRVal[1];
@@ -116,7 +120,7 @@ void straight(int Speed, long targetDistance)
       int Speed = 100;
       motor(Speed - speedDiff, Speed + speedDiff);
     }
-    else if (IRVal[2] < 1000 && IRVal[3] >= 1000)
+    else if (IRVal[2] < 1500 && IRVal[3] >= 1500)
     {
       system();
       //    int diff = IRVal[4] - IRVal[1];
@@ -146,6 +150,16 @@ void straight(int Speed, long targetDistance)
       motor(Speed - corr_value, Speed + corr_value);
       system();
     }
+    
+    /*
+    straightInput =  currRightDist - currLeftDist ;
+      straightSetpoint =  0;
+      straightPID.SetTunings(straightKp, straightKi, straightKd);
+      straightPID.Compute();
+      int corr_value = straightOutput;
+      motor(Speed - corr_value, Speed + corr_value);
+      system();
+      */
   }
 
 }
