@@ -52,18 +52,18 @@ void rpmMove(float target_rpm_left, float target_rpm_right)
 
     motor(SpeedLeft, SpeedRight);
 
-    //    Serial.print(v1Filt, 0);
-    //    Serial.print("  ");
-    //    Serial.print(v2Filt, 0);
-    //    Serial.print("  ");
-    //    Serial.print(target_rpm_left, 0);
-    //    Serial.print("  ");
-    //    Serial.print(target_rpm_right, 0);
-    //    Serial.print("  ");
-    //    Serial.print(0, 0);
-    //    Serial.print("  ");
-    //    Serial.print(900, 0);
-    //    Serial.println();
+        Serial.print(v1Filt, 0);
+        Serial.print("  ");
+        Serial.print(v2Filt, 0);
+        Serial.print("  ");
+        Serial.print(target_rpm_left, 0);
+        Serial.print("  ");
+        Serial.print(target_rpm_right, 0);
+        Serial.print("  ");
+        Serial.print(0, 0);
+        Serial.print("  ");
+        Serial.print(900, 0);
+        Serial.println();
 
   }
 }

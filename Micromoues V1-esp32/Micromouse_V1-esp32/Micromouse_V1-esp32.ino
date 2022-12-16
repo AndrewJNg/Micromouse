@@ -47,7 +47,7 @@ int rightWall = 1456;
 //TaskHandle_t SecondCoreAllocation;
 
 void setup() {
-  //  Serial.begin(115200);
+    Serial.begin(115200);
   Motor_setup();
   OLED_setup();
 
@@ -74,6 +74,8 @@ void setup() {
 
 
 void loop() {
+//Serial.println(AS5600_I2C_update_1());
+  
   system();
 
   if (Start)
@@ -86,22 +88,28 @@ void loop() {
       Start = false;
     }
     else if (Mode == 2)
-    {  // Reserved for Speed Run
-      printMap() ;
-  straight(100, 180 * 1);
-      
-      Start = false;
-    }
-    else if (Mode == 3)
-    { // Calibrate
-      //      OLED_display_stats();
-      //      Start = false;
-      printMap() ;
+    {  
+//      // Reserved for Speed Run
+//      printMap() ;
+//  straight(100, 180 * 1);
+//      
+//      Start = false;
+//    }
+//    else if (Mode == 3)
+//    { // Calibrate
+//      //      OLED_display_stats();
+//      //      Start = false;
+//      printMap() ;
+
+      OLED_display_stats();
+      int Speed = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY),-128,127,-300,300);
+      rpmMove(Speed, 0);
     }
     else if (Mode == 4)
     { // PS3 movement
       OLED_display_stats();
-      motor(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
+      int Speed = PS3_LeftAnalogStickSpeed(stick_LX, stick_LY);
+      motor(Speed, PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
     }
   }
   else

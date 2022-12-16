@@ -1,12 +1,12 @@
 #include <Wire.h>
 
 // Left encoder I2C pins
-#define SDA_1 21
-#define SCL_1 22
+const byte SDA_1 =21;
+const byte SCL_1 =22;
 
 // Right encoder I2C pins
-#define SDA_2 18
-#define SCL_2 19
+const byte SDA_2 =18;
+const byte SCL_2 =19;
 
 //TwoWire I2Cone = TwoWire(0);
 TwoWire I2Ctwo = TwoWire(1);
