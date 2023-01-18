@@ -12,7 +12,8 @@ unsigned long StartTimer = 0;
 
 //double Kp = 1.8, Ki = 1.8, Kd = 0.12;
 //double Kp = 5, Ki = 4.5, Kd = 0.03;
-double Kp = 5, Ki = 5.1, Kd = 0.03;
+double KpLeft = 5, KiLeft = 5.1, KdLeft = 0.03;
+double KpRight = 5, KiRight = 5.1, KdRight = 0.03;
 
 //double turnKp = 2, turnKi = 0, turnKd = 0.000;
 //double turnKp = 1, turnKi = 2, turnKd = 0.001;
@@ -102,8 +103,8 @@ void loop() {
 //      printMap() ;
 
       OLED_display_stats();
-      int Speed = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY),-128,127,-300,300);
-      rpmMove(Speed, 0);
+      int Speed = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY),-128,127,-30,30);
+      rpmMove(Speed, Speed);
     }
     else if (Mode == 4)
     { // PS3 movement
