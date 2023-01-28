@@ -44,5 +44,5 @@ void PID_setup()
   
   linePID.SetMode(AUTOMATIC);
   linePID.SetSampleTime(10);
-  linePID.SetOutputLimits(-255, 255);  // turn speed
+  linePID.SetOutputLimits(-255, 255);  // line following PID
 }

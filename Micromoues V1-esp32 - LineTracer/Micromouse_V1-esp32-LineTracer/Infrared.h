@@ -1,9 +1,5 @@
 
-//                                    {S1,S2,S5,S6,S3,S4}
-// const byte IREmitPin[6] = { };
-// const byte IRRecPin[6] = { 36, 39, 32, 33, 34, 35 };
-// int IRVal[6] = { 0, 0, 0, 0, 0,0};
-
+// IR pins
 const byte LED_Pin[5] = { 25, 26, 1, 27, 14 };
 const byte IRRecPin[5] = { 36, 39, 32, 34, 35 };
 int IRVal[5] = { 0, 0, 0, 0, 0 };
@@ -44,7 +40,7 @@ void IR_update() {
 
       // Apply value to binary output
       // if (valueIR > midIR[ledCount]) get_state[ledCount] = 1;
-      if (valueIR > 1000) get_state[ledCount] = 1;
+      if (valueIR > midIR[ledCount]) get_state[ledCount] = 1;
       else get_state[ledCount] = 0;
 
       // Invert if the line is white

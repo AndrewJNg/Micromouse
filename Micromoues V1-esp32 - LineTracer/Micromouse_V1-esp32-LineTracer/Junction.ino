@@ -17,7 +17,8 @@ void Junction(int speed_junction, float kp, float ki, float kd, char type, char 
     case 'M':
       do {
         PID(speed_junction, kp, ki, kd);
-      } while (get_state[0] == 0 || get_state[4] == 0);  // middle junction 1xxx1
+      } while (get_state[0] == 0 && get_state[4] == 0);  // middle junction 1xxx1
+      // } while (get_state[0] == 0 || get_state[4] == 0);  // middle junction 1xxx1
       choose_action(action, speed_junction, kp, ki, kd);
       break;
 

@@ -7,14 +7,17 @@
 void setup();
 void loop();
 void system();
-
+void read_memory();
+void bluetooth_setup();
+void bluetooth_loop();
+// void Junction(int speed_junction, float kp, float ki, float kd, char type, char action);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // global variables
 
 double startPoint = 0;
 double endPoint = 0;
 int Mode = 1;  // set mode 1 as default
-boolean Start = false;
+bool Start = false;
 unsigned long StartTimer = 0;
 
 //double Kp = 1.8, Ki = 1.8, Kd = 0.12;
@@ -41,6 +44,15 @@ int runSpeed = 60;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "BluetoothSerial.h"
+
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+
+BluetoothSerial SerialBT;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include <Wire.h>
 #include "Infrared.h"
 // #include "AS5600.h"
@@ -53,85 +65,125 @@ int runSpeed = 60;
 
 #include "User_interface.h"
 #include "OLED.h"
-#include "LineFollowing.h"
-
+bool Phone = false;
 
 void setup() {
   // Serial.begin(115200);
+  read_memory();
   Motor_setup();
   OLED_setup();
 
   IR_setup();
-  PS3_setup();
+  if (Phone == true)
+    bluetooth_setup();
+  else
+    PS3_setup();
 
   PID_setup();
   // Enc_setup();
   // Gyro_setup();
-
-
-  // FloodFill_setup();
 }
 
-void loop() {
-  // IR_update();
-  system();
+String my_list;
+int commandSeq[30];
+int commandStep = 0;
 
+void loop() {
+  system();
 
   if (Start) {
     if (Mode == 1) {
-      Junction(runSpeed, lineKp, lineKi, lineKd, 'L', 'L');
-      motor(0,0);
-      delay(1000);
+      // Junction(runSpeed, lineKp, lineKi, lineKd, 'L', 'L');
+      // Start = false;
+      // // Junction(runSpeed, lineKp, lineKi, lineKd, 'L', 'L');
+      // // Start = false;
+      // /*
+      Serial.println("Start");
+      for (int i = 0; i < sizeof(commandSeq) / 4; i++) {
 
+        switch (commandSeq[i]) {
+          case 1:  //Left
+                   // Serial.print("L ");
+            SerialBT.write('L');
+            Junction(runSpeed, lineKp, lineKi, lineKd, 'L', 'L');
+            motor(0, 0);
+            delay(1000);
+            break;
+
+          case 2:  // Ignore
+            // Serial.print("I ");
+            SerialBT.write('I');
+            Junction(runSpeed, lineKp, lineKi, lineKd, 'M', 'I');
+            motor(0, 0);
+            delay(1000);
+            break;
+
+          case 3:  // Right
+            // Serial.print("R ");
+            SerialBT.write('R');
+            Junction(runSpeed, lineKp, lineKi, lineKd, 'R', 'R');
+            motor(0, 0);
+            delay(1000);
+            break;
+
+          case 4:  // Right
+            // Serial.print("s ");
+            SerialBT.write('s');
+            Junction(runSpeed, lineKp, lineKi, lineKd, 'M', 's');
+            motor(0, 0);
+            delay(1000);
+            break;
+
+          default:  //Stop
+            // Serial.print("s ");
+            // Junction(runSpeed, lineKp, lineKi, lineKd, 'M', 's');
+            break;
+        }
+      }
+      for (int i = 0; i < sizeof(commandSeq) / 4; i++) {
+        commandSeq[i] = 0;
+      }
+      commandStep = 0;
+
+      motor(0, 0);
+      Start = 0;
+      delay(1000);
+// */
 
     } else if (Mode == 2) {
-      PID(runSpeed, lineKp, lineKi, lineKd);
-
-
-    } else if (Mode == 3) {  // Mok's PID
-      OLED.clearDisplay();
-
-      OLED.setTextSize(1);
-      OLED.setTextColor(SSD1306_WHITE);
-      OLED.setCursor(0, 0);
-      OLED.cp437(true);
-
-      OLED.print("runSpeed: ");
-      OLED.print(runSpeed);
-      OLED.println("\t");
-      OLED.print("lineKp: ");
-      OLED.print(lineKp, 3);
-      OLED.println("\t");
-      OLED.print("lineKi: ");
-      OLED.print(lineKi, 3);
-      OLED.println("\t");
-      OLED.print("lineKd: ");
-      OLED.print(lineKd, 3);
-      OLED.println("\t");
-
-      OLED.display();  //update the display
-      getLinePos(runSpeed, runSpeed, lineKp, lineKi, lineKd);
-
-
-
+      // PID(runSpeed, lineKp, lineKi, lineKd);
+      Junction(runSpeed, lineKp, lineKi, lineKd, 'R', 'R');
+      Start = false;
+    } else if (Mode == 3) {  // Calibration
+      calibration();
     } else if (Mode == 4) {  // PS3 movement
       OLED_display_stats();
-      int Speed = PS3_LeftAnalogStickSpeed(stick_LX, stick_LY);
-      motor(Speed, PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
+      // motor(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
+      if (Phone == true) {
+
+      }
+      // motor();
+      else {
+        motor(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY), PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
+      }
     }
-  } else {
+
+
+  }
+
+  else {
     motor(0, 0);
-    //rpmMove(0, 0);
     OLED_menu_display();
-    //    IR_left_menu.count(left_IR_button(), &Mode, -1);
-    //    IR_right_menu.count(right_IR_button(), &Mode, 1);
+
     if (Mode > 4) Mode = 1;
     else if (Mode < 1) Mode = 4;
   }
 }
 
+//system functions, important to keep different time sensitive functions working
 void system() {
-  //system functions, important to keep different time sensitive functions working
   IR_update();
   // Gyro_update();
+  if (Phone == true)
+    bluetooth_loop();
 }

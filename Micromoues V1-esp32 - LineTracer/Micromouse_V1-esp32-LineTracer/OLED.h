@@ -142,8 +142,10 @@ void OLED_menu_display()
     OLED.setTextColor(SSD1306_WHITE);
     OLED.setCursor(106, 7);
     OLED.cp437(true);
-    OLED.print(int(voltage_level()));
-    OLED.print("%");
+    OLED.print(voltage_level(),2);
+    OLED.print("V");
+    // OLED.print(int(voltage_level()));
+    // OLED.print("%");
 
     //////////////////////////////////////////////////////////////////////////////////////////
 

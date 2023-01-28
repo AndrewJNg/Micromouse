@@ -1,7 +1,7 @@
 // User Interface via potentiometers and OLED display, along with a battery management system
-int pot_Value = 0;
-const int pot_Pin = 36;
-const byte battMonitor_Pin = 32;
+// int pot_Value = 0;
+// const int pot_Pin = 36;
+const byte battMonitor_Pin = 33;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -48,14 +48,14 @@ button IR_right_menu;
 
 
 
-//disable voltage_level reading for 6 sensor configuration
-//const float R2 = 10.00;  // in kOhm
-//const float R1 = 9.85 + 9.77;
+// disable voltage_level reading for 6 sensor configuration
+const float R2 = 10.00;  // in kOhm
+const float R1 = 20.00;
 float voltage_level()
 {
-  //  float input_volt = (map(analogRead(battMonitor_Pin), 0, 4095, 0, 3300)) / 1000.00 ;
-  //  return (input_volt / (R2 / (R1 + R2)));
-  return map(PS3Batt, 0, 4, 0, 99);
+   float input_volt = (map(analogRead(battMonitor_Pin), 0, 4095, 0, 3300)) / 1000.00 ;
+   return (input_volt / (R2 / (R1 + R2))+0.4);
+  // return map(PS3Batt, 0, 4, 0, 99);
 
 }
 

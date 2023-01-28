@@ -65,6 +65,19 @@ void notify()
    if ( Ps3.event.button_down.circle )straightKd = straightKd + 0.001;
    if ( Ps3.event.button_down.square )straightKd = straightKd - 0.001;
  */
+      
+  //  if ( Ps3.event.button_down.triangle )Junction(runSpeed, lineKp, lineKi, lineKd, 'M', 'I');
+  //  if ( Ps3.event.button_down.cross )Junction(runSpeed, lineKp, lineKi, lineKd, 'M', 's');
+
+  //  if ( Ps3.event.button_down.right )Junction(runSpeed, lineKp, lineKi, lineKd, 'R', 'R');
+  //  if ( Ps3.event.button_down.left )Junction(runSpeed, lineKp, lineKi, lineKd, 'L', 'L');
+
+  //  if ( Ps3.event.button_down.circle )lineKd = lineKd + 0.01;
+  //  if ( Ps3.event.button_down.square )lineKd = lineKd - 0.01;
+
+  //  if ( Ps3.event.button_down.r1 )runSpeed = runSpeed + 10;
+  //  if ( Ps3.event.button_down.l1 )runSpeed = runSpeed - 10;
+      
    if ( Ps3.event.button_down.triangle )lineKp = lineKp + 0.1;
    if ( Ps3.event.button_down.cross )lineKp = lineKp - 0.1;
 
@@ -84,7 +97,7 @@ void notify()
    if ( battery == ps3_status_battery_charging )      PS3Batt = 5;
    else if ( battery == ps3_status_battery_full )     PS3Batt = 4;
    else if ( battery == ps3_status_battery_high )     PS3Batt = 3;
-   else if ( battery == ps3_status_battery_low)      PS3Batt = 2;
+   else if ( battery == ps3_status_battery_low)       PS3Batt = 2;
    else if ( battery == ps3_status_battery_dying )    PS3Batt = 1;
    else if ( battery == ps3_status_battery_shutdown ) PS3Batt = 0;
    //        else Serial.println("UNDEFINED");
