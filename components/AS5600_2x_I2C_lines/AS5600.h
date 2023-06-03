@@ -45,7 +45,7 @@ void AS5600_I2C_setup_1()
 
   Wire.beginTransmission(byte(0x36));
   Wire.write(byte(0x08));
-  Wire.write(byte(0xE3));
+  Wire.write(byte(0xC3));
   Wire.endTransmission();
   delay(5);
 }
@@ -85,7 +85,7 @@ void AS5600_I2C_setup_2()
 
    I2Ctwo.beginTransmission(byte(0x36));
    I2Ctwo.write(byte(0x08));
-   I2Ctwo.write(byte(0xE3));
+   I2Ctwo.write(byte(0xC3));
    I2Ctwo.endTransmission();
   delay(5);
 }

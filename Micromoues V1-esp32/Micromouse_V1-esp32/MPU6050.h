@@ -286,7 +286,9 @@ void Gyro_update()
     gyroX = -ypr[1] * 180 / M_PI;
     gyroY = ypr[2] * 180 / M_PI;
 //    gyroZ= ypr[0] * 180 / M_PI;
+
     gyroZ= MPU_Z_angle();
+
 //    Serial.print("ypr\t");
 //    Serial.print(ypr[0] * 180 / M_PI);
 //    Serial.print("\t");

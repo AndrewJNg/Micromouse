@@ -1,9 +1,9 @@
 
-const int mazeWidth = 4 ;
-const int mazeHeight = 3;
+const int mazeWidth = 32;
+const int mazeHeight = 32;
 
-int target_X[] = {3};
-int target_Y[] = {2};
+int target_X[] = {0};
+int target_Y[] = {3};
 
 int start_X[] = {0};
 int start_Y[] = {0};
@@ -29,6 +29,7 @@ struct cell ***mazePtr = NULL; // pointer pointing to first node in queue
 
 
 void printMap() {
+  
   OLED.clearDisplay();
   OLED.setTextSize(1);
   OLED.setTextColor(SSD1306_WHITE);

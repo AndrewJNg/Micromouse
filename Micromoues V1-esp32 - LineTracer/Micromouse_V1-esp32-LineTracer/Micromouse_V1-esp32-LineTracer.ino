@@ -35,12 +35,13 @@ double rpmSetRight, InputRpmRight, OutputRightMotor;
 double turnSetpoint, turnInput, turnOutput;
 double straightSetpoint, straightInput, straightOutput;
 
-double lineKp = 2.8, lineKi = 0.001, lineKd = 0.04;
+double lineKp = 3, lineKi = 0.001, lineKd = 0.04;
 // double lineKp = 3.0, lineKi = 0, lineKd = 0.40;
 double lineSetpoint, lineInput, lineOutput;
 
 
-int runSpeed = 60;
+int runSpeed = 80;
+int turnSpeed = 80;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -65,6 +66,7 @@ BluetoothSerial SerialBT;
 
 #include "User_interface.h"
 #include "OLED.h"
+// bool Phone = true;
 bool Phone = false;
 
 void setup() {
@@ -103,40 +105,40 @@ void loop() {
 
         switch (commandSeq[i]) {
           case 1:  //Left
-                   // Serial.print("L ");
+            Serial.print("L ");
             SerialBT.write('L');
             Junction(runSpeed, lineKp, lineKi, lineKd, 'L', 'L');
             motor(0, 0);
-            delay(1000);
+            delay(500);
             break;
 
           case 2:  // Ignore
-            // Serial.print("I ");
+            Serial.print("I ");
             SerialBT.write('I');
             Junction(runSpeed, lineKp, lineKi, lineKd, 'M', 'I');
             motor(0, 0);
-            delay(1000);
+            delay(500);
             break;
 
           case 3:  // Right
-            // Serial.print("R ");
+            Serial.print("R ");
             SerialBT.write('R');
             Junction(runSpeed, lineKp, lineKi, lineKd, 'R', 'R');
             motor(0, 0);
-            delay(1000);
+            delay(500);
             break;
 
-          case 4:  // Right
-            // Serial.print("s ");
+          case 4:  // Stop
+            Serial.print("s ");
             SerialBT.write('s');
-            Junction(runSpeed, lineKp, lineKi, lineKd, 'M', 's');
+            Junction(runSpeed, lineKp, lineKi, lineKd, 'R', 's');
             motor(0, 0);
-            delay(1000);
+            delay(500);
             break;
 
           default:  //Stop
             // Serial.print("s ");
-            // Junction(runSpeed, lineKp, lineKi, lineKd, 'M', 's');
+            // Junction(runSpeed, lineKp, lineKi, lineKd, 'R', 's');
             break;
         }
       }
@@ -148,7 +150,7 @@ void loop() {
       motor(0, 0);
       Start = 0;
       delay(1000);
-// */
+      // */
 
     } else if (Mode == 2) {
       // PID(runSpeed, lineKp, lineKi, lineKd);

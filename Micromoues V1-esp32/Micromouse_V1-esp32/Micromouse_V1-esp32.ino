@@ -6,7 +6,7 @@ void system();
 
 double startPoint = 0;
 double endPoint = 0;
-int Mode = 1;// set mode 1 as default
+int Mode = 1;  // set mode 1 as default
 boolean Start = false;
 unsigned long StartTimer = 0;
 
@@ -45,10 +45,21 @@ int rightWall = 1456;
 #include "FloodFill.h"
 
 
-//TaskHandle_t SecondCoreAllocation;
+TaskHandle_t Task2;
 
 void setup() {
-    Serial.begin(115200);
+  // // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
+  // xTaskCreatePinnedToCore(
+  //   Task2code, /* Task function. */
+  //   "Task2",   /* name of task. */
+  //   80000,     /* Stack size of task */
+  //   NULL,      /* parameter of the task */
+  //   1,         /* priority of the task */
+  //   &Task2,    /* Task handle to keep track of created task */
+  //   0);        /* pin task to core 0 */
+
+
+  Serial.begin(115200);
   Motor_setup();
   OLED_setup();
 
@@ -61,89 +72,78 @@ void setup() {
   PID_setup();
   FloodFill_setup();
 
-  //create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
-  //  xTaskCreatePinnedToCore(
-  //                    Core0,   /* Task function. */
-  //                    "Task1",     /* name of task. */
-  //                    10000,       /* Stack size of task */
-  //                    NULL,        /* parameter of the task */
-  //                    1,           /* priority of the task */
-  //                    &SecondCoreCode,      /* Task handle to keep track of created task */
-  //                    0);          /* pin task to core 0 */
 }
 
 
 
 void loop() {
-//Serial.println(AS5600_I2C_update_1());
-  
+  //Serial.println(AS5600_I2C_update_1());
+
   system();
 
-  if (Start)
-  {
-    if (Mode == 1)
-    { // First search for new map
+
+  if (Start) {
+    if (Mode == 1) {  // First search for new map
       clearMap();
-      printMap() ;
+      printMap();
       first_Search();
       Start = false;
-    }
-    else if (Mode == 2)
-    {  
-//      // Reserved for Speed Run
-//      printMap() ;
-//  straight(100, 180 * 1);
-//      
-//      Start = false;
-//    }
-//    else if (Mode == 3)
-//    { // Calibrate
-//      //      OLED_display_stats();
-//      //      Start = false;
-//      printMap() ;
+    } else if (Mode == 2) {  // Speed Run
+      printMap();
+      first_Search();
+      Start = false;
+
+      //  straight(100, 180 * 1);
+
+    } else if (Mode == 3) {
+      // Calibration
 
       OLED_display_stats();
-      int Speed = map(PS3_LeftAnalogStickSpeed(stick_LX, stick_LY),-128,127,-30,30);
-      rpmMove(Speed, Speed);
-    }
-    else if (Mode == 4)
-    { // PS3 movement
+      //  printMap() ;
+      Start = false;
+
+    } else if (Mode == 4) {
+      // PS3 movement
       OLED_display_stats();
-      int Speed = PS3_LeftAnalogStickSpeed(stick_LX, stick_LY);
-      motor(Speed, PS3_LeftAnalogStickSpeed(stick_RX, stick_RY));
+      // motor(PS3_LeftAnalogStickSpeed(stick_LY), PS3_LeftAnalogStickSpeed(stick_RY));
+
+      int Speed = map(PS3_LeftAnalogStickSpeed(stick_LY), -255, 255, -200, 200);
+      int Diff = map(PS3_LeftAnalogStickSpeed(stick_RX), -255, 255, -200, 200);
+      // rpmMove(Speed + Diff, Speed - Diff);
+      motor(Speed + Diff, Speed - Diff);
     }
-  }
-  else
-  {
+  } else {
     motor(0, 0);
     //rpmMove(0, 0);
     OLED_menu_display();
     //    IR_left_menu.count(left_IR_button(), &Mode, -1);
     //    IR_right_menu.count(right_IR_button(), &Mode, 1);
-    if        (Mode > 4)  Mode = 1;
-    else if (Mode < 1)  Mode = 4;
-
+    if (Mode > 4) Mode = 1;
+    else if (Mode < 1) Mode = 4;
   }
 }
 
-void system()
-{
+void system() {
   //system functions, important to keep different time sensitive functions working
   IR_update();
   Gyro_update();
 }
-//Task1code: blinks an LED every 1000 ms
-//void SecondCoreCode( void * pvParameters ){
-//  //Setup
-//  Serial.print("Task1 running on core ");
-//  Serial.println(xPortGetCoreID());
-//
-//
-//// loop function
-//  for(;;){
-////    digitalWrite(2, HIGH);
-////    delay(1000);
-////    digitalWrite(2, LOW);
-////    delay(1000);
-//  }
-//}
+
+
+// //Task1code: blinks an LED every 1000 ms
+// void Task2code(void* pvParameters) {
+//   //Setup
+//   Serial.print("Task1 running on core ");
+//   Serial.println(xPortGetCoreID());
+  
+//   TickType_t xLastWakeTime;
+//   const TickType_t xFrequency = 100;
+//   xLastWakeTime = xTaskGetTickCount();
+
+
+//   // loop function
+//   for (;;) {
+//     vTaskDelayUntil( &xLastWakeTime, xFrequency );
+//     IR_update();
+//   }
+// }

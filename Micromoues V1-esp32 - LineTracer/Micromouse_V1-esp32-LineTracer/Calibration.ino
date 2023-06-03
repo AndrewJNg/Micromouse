@@ -186,7 +186,7 @@ void calibration()
 // }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-// https://randomnerdtutorials.com/esp32-save-data-permanently-preferences/
+//  
 // save calibration values into esp32
 #include <Preferences.h>
 Preferences preferences;

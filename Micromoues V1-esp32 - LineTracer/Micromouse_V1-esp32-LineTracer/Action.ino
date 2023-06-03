@@ -1,3 +1,4 @@
+
 void choose_action(char action_, int speed_junction_, float kp_, float ki_, float kd_) {
   switch (action_) {
     case 'I':  //ignore
@@ -12,14 +13,14 @@ void choose_action(char action_, int speed_junction_, float kp_, float ki_, floa
     case 'L':  //left
       // Serial.print("L ");
       do {
-        motor(100, 100);
+        motor(turnSpeed, turnSpeed);
       } while ((get_state[0] == 1) || (get_state[4] == 1));
 
       do {
-        motor(-100, 100);
+        motor(-turnSpeed, turnSpeed);
       } while (get_state[0] == 0);
       do {
-        motor(-100, 100);
+        motor(-turnSpeed, turnSpeed);
       } while ((get_state[0] == 1) || (get_state[1] == 0));
       break;
 
@@ -69,13 +70,13 @@ void choose_action(char action_, int speed_junction_, float kp_, float ki_, floa
 
     case 'R':  //right
       do {
-        motor(100, 100);
+        motor(turnSpeed, turnSpeed);
       } while ((get_state[0] == 1) || (get_state[4] == 1));
       do {
-        motor(100, -100);
+        motor(turnSpeed, -turnSpeed);
       } while (get_state[4] == 0);
       do {
-        motor(100, -100);
+        motor(turnSpeed, -turnSpeed);
       } while ((get_state[3] == 0) || (get_state[4] == 1));
 
       // Serial.print("R ");

@@ -80,18 +80,22 @@ void turn(int  turnDegree)
     //      int speedTol = 300;
     int speedTol = 100;
     double diff = targetAngle - gyroZ ;
-    if (diff < -40) diff = -40;
-    else if (diff > 40) diff = 40;
-    int Speed = map(diff, -40, 40, -speedTol , speedTol );
+    if (diff < -20) diff = -20;
+    else if (diff > 20) diff = 20;
+    int Speed = map(diff, -20, 20, -speedTol , speedTol );
     motor(Speed, -Speed);
     //    rpmMove(Speed, -Speed);
     system();
   }
 
+  // Aligning to front wall
   if ( IRVal[0] >=3500 ||  IRVal[5] >= 3500)
   {
     align_to_front_wall();
   }
+  
+  motor(0, 0);
+  
   //do {
   //    Input = MPU_Z_angle()-Setpoint;
   //    myPID.SetOutputLimits(-255, 255);
@@ -128,5 +132,4 @@ void turn(int  turnDegree)
   //    system();
   //  }
 
-  motor(0, 0);
 }

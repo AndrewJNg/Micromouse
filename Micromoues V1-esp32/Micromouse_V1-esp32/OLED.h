@@ -196,26 +196,44 @@ void OLED_menu_display()
     OLED.cp437(true);
     if (Mode == 1)
     {
-      OLED.setTextSize(7);
-      OLED.setCursor(50, 10);
-      OLED.print("1");
+      
+      OLED.setTextSize(1);
+      OLED.setCursor(25, 20);
+      OLED.println("Vel   = 1");
+      OLED.setCursor(25, 30);
+      OLED.println("Accel = 1");
+
+      
+      OLED.setTextSize(2);
+      OLED.setCursor(25, 50);
+      OLED.print("Search");
     }
     else if (Mode == 2)
     {
-      OLED.setTextSize(7);
-      OLED.setCursor(50, 10);
-      OLED.print("2");
+
+      OLED.setTextSize(1);
+      OLED.setCursor(25, 20);
+      OLED.println("Vel   = 1");
+      OLED.setCursor(25, 30);
+      OLED.println("Accel = 1");
+      
+      OLED.setTextSize(2);
+      OLED.setCursor(25, 50);
+      OLED.println("Speed");
     }
     else if (Mode == 3)
     {
-      OLED.drawBitmap(22, 35, Calibrate_Logo, 106, 30, 1);
+      // OLED.drawBitmap(22, 35, Calibrate_Logo, 106, 30, 1);
+      OLED.setTextSize(2);
+      OLED.setCursor(25, 50);
+      OLED.println("Calibr");
     }
     else if (Mode == 4)
     {
       OLED.setTextSize(2);
-      OLED.setCursor(30, 20);
+      OLED.setCursor(25, 30);
       OLED.println("PS3");
-      OLED.setCursor(30, 40);
+      OLED.setCursor(25, 50);
       OLED.print("controls");
     }
   }
@@ -372,6 +390,12 @@ void OLED_display_stats()
     OLED.println(turnKi,5);
     OLED.print("D: ");
     OLED.println(turnKd,5);
+
+    
+    OLED.print("Gyro: ");
+    OLED.println(gyroZ,2);
+
+    
     /*
      
     OLED.print("P: ");
