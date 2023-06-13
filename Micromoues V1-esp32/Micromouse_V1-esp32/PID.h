@@ -24,12 +24,14 @@ void PID_setup()
   //  Setpoint = 100;
 
   leftMotorVel.SetMode(AUTOMATIC);
-  leftMotorVel.SetSampleTime(10);
+  leftMotorVel.SetSampleTime(1);
   leftMotorVel.SetOutputLimits(-255, 255);
 
   rightMotorVel.SetMode(AUTOMATIC);
-  rightMotorVel.SetSampleTime(10);
+  rightMotorVel.SetSampleTime(1);
   rightMotorVel.SetOutputLimits(-255, 255);
+
+///////////////////////////////////////////////////////////////////////////////////
 
   turnPID.SetMode(AUTOMATIC);
   turnPID.SetSampleTime(1);

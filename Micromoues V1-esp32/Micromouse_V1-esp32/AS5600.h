@@ -56,7 +56,7 @@ void AS5600_I2C_setup_1()
 
   // set stop position (MPOS) as 0 
   Wire.beginTransmission(byte(0x36));
-  Wire.write(byte(0x03));     // enter second MPOS address
+  Wire.write(byte(0x03));     // enter first MPOS address
   Wire.write(byte(0x00));     // set as 0
   Wire.endTransmission();
   delay(5);
@@ -71,13 +71,11 @@ void AS5600_I2C_setup_1()
   Wire.beginTransmission(byte(0x36));
   Wire.write(byte(0x07));       // enter first config address
   Wire.write(byte(0x03));    // switch off watchdog, switch off fast filtering, and turn slow filtering to fastest responce
-//  IWire.write(byte(0x3F));    //
   Wire.endTransmission();
   delay(5);
   Wire.beginTransmission(byte(0x36));
   Wire.write(byte(0x08));    // enter second config address
   Wire.write(byte(0x20));   // switch off watchdog, switch off fast filtering, and turn slow filtering to fastest responce
-//  Wire.write(byte(0xE3));   // switch off watchdog, switch off fast filtering, and turn slow filtering to fastest responce
   Wire.endTransmission();
   delay(5);
 }
@@ -101,7 +99,7 @@ void AS5600_I2C_setup_2()
 
   // set stop position (MPOS) as 0 
   I2Ctwo.beginTransmission(byte(0x36));
-  I2Ctwo.write(byte(0x03));     // enter second MPOS address
+  I2Ctwo.write(byte(0x03));     // enter first MPOS address
   I2Ctwo.write(byte(0x00));     // set as 0
   I2Ctwo.endTransmission();
   delay(5);
@@ -116,13 +114,11 @@ void AS5600_I2C_setup_2()
   I2Ctwo.beginTransmission(byte(0x36));
   I2Ctwo.write(byte(0x07));       // enter first config address
   I2Ctwo.write(byte(0x03));    // switch off watchdog, switch off fast filtering, and turn slow filtering to fastest responce
-//  II2Ctwo.write(byte(0x3F));    //
   I2Ctwo.endTransmission();
   delay(5);
   I2Ctwo.beginTransmission(byte(0x36));
   I2Ctwo.write(byte(0x08));    // enter second config address
   I2Ctwo.write(byte(0x20));   // switch off watchdog, switch off fast filtering, and turn slow filtering to fastest responce
-//  I2Ctwo.write(byte(0xE3));   // switch off watchdog, switch off fast filtering, and turn slow filtering to fastest responce
   I2Ctwo.endTransmission();
   delay(5);
 }
@@ -176,18 +172,16 @@ void enc_motor_update()
   currAngle[0] = AS5600_I2C_update_1();
   currAngle[1] = AS5600_I2C_update_2();
   for (int i = 0; i < 2; i++)
-  {
+  {   
+    // 12 bit encoder that corresponds to 360 degree angle
     //    0 = -180
     //    1024 = -90
     //    2048 = 0
     //    3072 = 90
     //    4096 = 180
-    //    if ((prevAngle[i] > 2560 && prevAngle[i]  < 4096  ) && ( currAngle[i]  >  0 &&  currAngle[i]  < 1536 )  ) multiplyAngle[i]++;
-    //    else if ((prevAngle[i]  >  0 &&  prevAngle[i]  < 1536 ) && (currAngle[i]  > 2560 && currAngle[i]  < 4096)  ) multiplyAngle[i]--;
     if ((prevAngle[i] >= 3072 && prevAngle[i]  <= 4096  ) && ( currAngle[i]  >=  0 &&  currAngle[i]  <= 1024 )  ) multiplyAngle[i]++;
     else if ((prevAngle[i]  >=  0 &&  prevAngle[i]  <= 1024 ) && (currAngle[i]  >= 3072 && currAngle[i]  <= 4096)  ) multiplyAngle[i]--;
     prevAngle[i]  = currAngle[i] ;
-
     currAngle[i]  = currAngle[i]  + multiplyAngle[i]  * 4096;
   }
 

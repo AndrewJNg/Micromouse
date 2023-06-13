@@ -1,13 +1,24 @@
+/*
+This is for a cheap but capable maze solving robot (below RM200) with sufficient hardware to perform high level speed control 
+- ESP32 microcontroller with bluetooth capabilities for wireless control with PS3
+- 12 bit magnetic encoder (AS5600 - I2C)
+- 600RPM N20 motors
+- TB6612FNG motor driver
+- 6 IR sensor pairs (TEFT4300 phototransistor, TSAL4400 emitter) 
+- MPU6050 gyroscope (I2C)
+- OLED display (I2C)
+
+Written by Andrew Joseph Ng (AndrewJNg)
+*/
 
 // function prototypes
 void setup();
 void loop();
 void system();
 
-double startPoint = 0;
-double endPoint = 0;
 int Mode = 1;  // set mode 1 as default
-boolean Start = false;
+int Start = false;
+
 unsigned long StartTimer = 0;
 
 //double Kp = 1.8, Ki = 1.8, Kd = 0.12;
@@ -26,15 +37,19 @@ double rpmSetRight, InputRpmRight, OutputRightMotor;
 double turnSetpoint, turnInput, turnOutput;
 double straightSetpoint, straightInput, straightOutput;
 
-int leftWall = 1910;
-int rightWall = 1456;
+int leftWall = 50;
+int rightWall = 50;
 #include <Wire.h>
+
 #include "Infrared.h"
+#include "Memory.h"  // store IR values
+
 #include "AS5600.h"
 #include "MPU6050.h"
 #include "Movement.h"
 #include "PID.h"
 
+#include "lowPass.h"
 #include "Speed_profile.h"
 #include "Cell_movement.h"
 #include "PS3.h"
@@ -44,26 +59,15 @@ int rightWall = 1456;
 
 #include "FloodFill.h"
 
-
-TaskHandle_t Task2;
-
 void setup() {
-  // // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
-  // xTaskCreatePinnedToCore(
-  //   Task2code, /* Task function. */
-  //   "Task2",   /* name of task. */
-  //   80000,     /* Stack size of task */
-  //   NULL,      /* parameter of the task */
-  //   1,         /* priority of the task */
-  //   &Task2,    /* Task handle to keep track of created task */
-  //   0);        /* pin task to core 0 */
-
 
   Serial.begin(115200);
   Motor_setup();
   OLED_setup();
 
   IR_setup();
+  read_memory();
+
   Enc_setup();
   Gyro_setup();
 
@@ -71,16 +75,12 @@ void setup() {
 
   PID_setup();
   FloodFill_setup();
-
 }
 
 
 
 void loop() {
-  //Serial.println(AS5600_I2C_update_1());
-
   system();
-
 
   if (Start) {
     if (Mode == 1) {  // First search for new map
@@ -88,36 +88,64 @@ void loop() {
       printMap();
       first_Search();
       Start = false;
+
+
+
+
     } else if (Mode == 2) {  // Speed Run
-      printMap();
-      first_Search();
-      Start = false;
+
+      align_to_front_wall();
+
+      // printMap();
+      // first_Search();
+      // Start = false;
 
       //  straight(100, 180 * 1);
 
-    } else if (Mode == 3) {
-      // Calibration
 
-      OLED_display_stats();
-      //  printMap() ;
+
+
+    } else if (Mode == 3) {  // Calibration
+      unsigned long IR_calibrate_start = millis();
+
+      // reset values
+      for (int i = 0; i < sizeof(IREmitPin); i++) {
+        minIR[i] = 4095;
+        maxIR[i] = 0;
+      }
+
+      // run calibration for 10 seconds
+      do {
+        calibration();
+        IR_update();
+        OLED_display_stats();
+      } while ((millis() - IR_calibrate_start) <= 10000);
+
+      store_memory_IR();
       Start = false;
+
+
+
 
     } else if (Mode == 4) {
       // PS3 movement
       OLED_display_stats();
-      // motor(PS3_LeftAnalogStickSpeed(stick_LY), PS3_LeftAnalogStickSpeed(stick_RY));
 
       int Speed = map(PS3_LeftAnalogStickSpeed(stick_LY), -255, 255, -200, 200);
       int Diff = map(PS3_LeftAnalogStickSpeed(stick_RX), -255, 255, -200, 200);
       // rpmMove(Speed + Diff, Speed - Diff);
       motor(Speed + Diff, Speed - Diff);
     }
-  } else {
-    motor(0, 0);
+  } else {// Menu operation
+  
     //rpmMove(0, 0);
+    motor(0, 0);
     OLED_menu_display();
-    //    IR_left_menu.count(left_IR_button(), &Mode, -1);
-    //    IR_right_menu.count(right_IR_button(), &Mode, 1);
+
+    encoderMode();
+    // IR_left_menu.count(left_IR_button(), &Mode, 1);
+    IR_right_menu.count(right_IR_button(), &Start, 1);
+
     if (Mode > 4) Mode = 1;
     else if (Mode < 1) Mode = 4;
   }
@@ -128,22 +156,3 @@ void system() {
   IR_update();
   Gyro_update();
 }
-
-
-// //Task1code: blinks an LED every 1000 ms
-// void Task2code(void* pvParameters) {
-//   //Setup
-//   Serial.print("Task1 running on core ");
-//   Serial.println(xPortGetCoreID());
-  
-//   TickType_t xLastWakeTime;
-//   const TickType_t xFrequency = 100;
-//   xLastWakeTime = xTaskGetTickCount();
-
-
-//   // loop function
-//   for (;;) {
-//     vTaskDelayUntil( &xLastWakeTime, xFrequency );
-//     IR_update();
-//   }
-// }

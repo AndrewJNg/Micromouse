@@ -2,14 +2,12 @@
 // uses variables from encoder to allow better forward and backward movement
 extern bool motorForward[2];
 
-
 const byte motorPin1[] =  {4, 16};
 const byte motorPin2[] = {2, 17};
 
 const byte motorPWM[] = {15, 5};
-
-
 //const byte motorSTBY[] = {27};
+
 
 //ESP32 settings for pwm channel
 const byte motorChannel[] = {0, 1};

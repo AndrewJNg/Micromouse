@@ -1,6 +1,6 @@
 
-const int mazeWidth = 32;
-const int mazeHeight = 32;
+const int mazeWidth = 4;//32;
+const int mazeHeight = 4;//32;
 
 int target_X[] = {0};
 int target_Y[] = {3};
@@ -373,15 +373,15 @@ void decide_path(boolean Virtual)
 
 void scan()
 {
-  if (IRVal[0] > 1000 && IRVal[5] > 1000) // scan wallFront()
+  if (IRVal[0] > 50 && IRVal[5] > 50) // scan wallFront()
   {
     setWall(curr_X_coor, curr_Y_coor, dir2cardinal(curr_dir));
   }
-  if (IRVal[2] > 1000) // scan wallLeft()
+  if (IRVal[2] > 50) // scan wallLeft()
   {
     setWall(curr_X_coor, curr_Y_coor, dir2cardinal(curr_dir - 1));
   }
-  if (IRVal[3] > 1000) // scan wallRight()
+  if (IRVal[3] > 50) // scan wallRight()
   {
     setWall(curr_X_coor, curr_Y_coor, dir2cardinal(curr_dir + 1));
   }
