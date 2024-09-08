@@ -23,7 +23,7 @@ unsigned long StartTimer = 0;
 
 //double Kp = 1.8, Ki = 1.8, Kd = 0.12;
 //double Kp = 5, Ki = 4.5, Kd = 0.03;
-double KpLeft = 5, KiLeft = 5.1, KdLeft = 0.03;
+double KpLeft = 0.5, KiLeft = 0, KdLeft = 0.005;
 double KpRight = 5, KiRight = 5.1, KdRight = 0.03;
 
 //double turnKp = 2, turnKi = 0, turnKd = 0.000;

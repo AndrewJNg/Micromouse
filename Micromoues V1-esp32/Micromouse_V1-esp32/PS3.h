@@ -45,14 +45,23 @@ void notify() {
   // if (Ps3.event.button_down.square) turn(-90);
 
 
-   if ( Ps3.event.button_down.triangle )turnKp = turnKp + 0.1;
-   if ( Ps3.event.button_down.cross )turnKp = turnKp - 0.1;
+   if ( Ps3.event.button_down.triangle )KpLeft = KpLeft + 0.01;
+   if ( Ps3.event.button_down.cross )KpLeft = KpLeft - 0.01;
   
-   if ( Ps3.event.button_down.right )turnKi = turnKi + 2;
-   if ( Ps3.event.button_down.left )turnKi = turnKi - 2;
+   if ( Ps3.event.button_down.right )KiLeft = KiLeft + 2;
+   if ( Ps3.event.button_down.left )KiLeft = KiLeft - 2;
   
-   if ( Ps3.event.button_down.circle )turnKd = turnKd + 0.0001;
-   if ( Ps3.event.button_down.square )turnKd = turnKd - 0.0001;
+   if ( Ps3.event.button_down.circle )KdLeft = KdLeft + 0.00001;
+   if ( Ps3.event.button_down.square )KdLeft = KdLeft - 0.00001;
+
+  //  if ( Ps3.event.button_down.triangle )turnKp = turnKp + 0.1;
+  //  if ( Ps3.event.button_down.cross )turnKp = turnKp - 0.1;
+  
+  //  if ( Ps3.event.button_down.right )turnKi = turnKi + 2;
+  //  if ( Ps3.event.button_down.left )turnKi = turnKi - 2;
+  
+  //  if ( Ps3.event.button_down.circle )turnKd = turnKd + 0.0001;
+  //  if ( Ps3.event.button_down.square )turnKd = turnKd - 0.0001;
   /*
    if ( Ps3.event.button_down.triangle )straightKp = straightKp + 0.1;
    if ( Ps3.event.button_down.cross )straightKp = straightKp - 0.1;

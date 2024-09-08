@@ -1,3 +1,7 @@
+
+int cell_distance = 180; //180mm from center to center of the cells
+
+
 void align_to_front_wall( int speedTol = 200, int targetReadingLeft = 100, int targetReadingRight = 100)
 {
   unsigned long saveMillis = millis();

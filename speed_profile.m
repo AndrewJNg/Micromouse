@@ -80,7 +80,7 @@ km = 2100/6;%1000/1;
 Tm = 1;
 
 speed_ff = 0.00370;
-bias_ff = 0.19533;
+bias_ff = 0.19533; % bias voltage
 acc_ff = 0.001 *Tm ;%0.002;
 
 % vel = Vmax*(1-exp(-t/Tm));
@@ -101,18 +101,18 @@ plot(t,Volt)
 % 
 % figure(3)
 % plot(t,x)
-
-
-
+% 
+% 
+% 
 % Ks = 0.14;
 % Kv = 0.00048;
 % Ka = 0.00016;
 % 
 % d_d = v;
 % d_dd = a;
-
+% 
 % y = (1/2 *t - 1/(2^2) + 1/(2^2)*exp(-2*t)) *5
-
+% 
 % volt = v ./ (1/2 .*t - 1/(2^2) + 1/(2^2).*exp(-2.*t));
 % figure(3)
 % plot(t,volt)

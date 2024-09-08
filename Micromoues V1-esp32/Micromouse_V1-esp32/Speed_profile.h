@@ -45,28 +45,29 @@ void rpmMove(float target_rpm_left, float target_rpm_right) {
     double SpeedRight = OutputRightMotor;
 
     // apply speed to motor drivers
-    motor(SpeedLeft, SpeedRight);
+    // motor(SpeedLeft, SpeedRight);
+    motor(SpeedLeft, 0);
     // motor(0, 0);
 
 
     Serial.print(SpeedLeft, 0);
     Serial.print("\t");
-    Serial.print(SpeedRight, 0);
-    Serial.print("\t");
+    // Serial.print(SpeedRight, 0);
+    // Serial.print("\t");
 
     Serial.print(rpmLeft, 0);
     Serial.print("\t");
-    Serial.print(rpmRight, 0);
-    Serial.print("\t");
+    // Serial.print(rpmRight, 0);
+    // Serial.print("\t");
 
-    Serial.print(v1Filt, 0);
-    Serial.print("\t");
-    Serial.print(v2Filt, 0);
-    Serial.print("\t");
+    // Serial.print(v1Filt, 0);
+    // Serial.print("\t");
+    // Serial.print(v2Filt, 0);
+    // Serial.print("\t");
     Serial.print(target_rpm_left, 0);
     Serial.print("\t");
-    Serial.print(target_rpm_right, 0);
-    Serial.print("\t");
+    // Serial.print(target_rpm_right, 0);
+    // Serial.print("\t");
     Serial.print(0, 0);
     Serial.print("\t");
     Serial.print(900, 0);

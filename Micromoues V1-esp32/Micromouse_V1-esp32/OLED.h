@@ -385,11 +385,11 @@ void OLED_display_stats()
 //    OLED.println(micros() - timeRecord);
     
     OLED.print("P: ");
-    OLED.println(turnKp,5);
+    OLED.println(KpLeft,5);
     OLED.print("I: ");
-    OLED.println(turnKi,5);
+    OLED.println(KiLeft,5);
     OLED.print("D: ");
-    OLED.println(turnKd,5);
+    OLED.println(KdLeft,5);
 
     
     OLED.print("Gyro: ");
