@@ -62,32 +62,37 @@ int rightWall = 50;
 void setup() {
 
   Serial.begin(115200);
+  
   Motor_setup();
   OLED_setup();
-
+  
   IR_setup();
   read_memory();
-
+  
   Enc_setup();
   Gyro_setup();
-
+  
   PS3_setup();
-
+  
   PID_setup();
   FloodFill_setup();
-}
+  
+  }
 
 
 
 void loop() {
   system();
-
+  Start = 1;
+  Mode = 4;
+  
   if (Start) {
     if (Mode == 1) {  // First search for new map
       clearMap();
       printMap();
       first_Search();
       Start = false;
+      
 
 
 
@@ -135,6 +140,7 @@ void loop() {
       int Diff = map(PS3_LeftAnalogStickSpeed(stick_RX), -255, 255, -200, 200);
       // rpmMove(Speed + Diff, Speed - Diff);
       motor(Speed + Diff, Speed - Diff);
+      // motor(0,0);
     }
   } else {// Menu operation
   

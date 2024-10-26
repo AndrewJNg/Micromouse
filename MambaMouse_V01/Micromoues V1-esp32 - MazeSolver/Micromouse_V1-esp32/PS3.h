@@ -133,5 +133,6 @@ void PS3_setup() {
   Ps3.attachOnConnect(onConnect);
   //  Ps3.begin("01:02:03:04:05:06");
   //  Ps3.begin("bb:bb:bb:bb:bb:bb");
-  Ps3.begin("cc:cc:cc:cc:cc:cc");
+  // Ps3.begin("cc:cc:cc:cc:cc:cc");
+  Ps3.begin("aa:aa:aa:aa:aa:aa");
 }

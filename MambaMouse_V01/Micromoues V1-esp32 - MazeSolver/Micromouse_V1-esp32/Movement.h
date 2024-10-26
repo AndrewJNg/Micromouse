@@ -53,7 +53,7 @@ void motor(int speedLeft, int speedRight)
     }
 
   }
-  enc_motor_update();
+  //enc_motor_update();
 
 }
 
@@ -78,6 +78,8 @@ void Motor_setup()
     //set pwm pins
     ledcSetup(motorChannel[x], 5000, PWM_resolution);
     ledcAttachPin(motorPWM[x] , motorChannel[x] );
+    
+    // ledcAttach(motorPWM[x], 5000, PWM_resolution );
 
     digitalWrite(motorPin1[x], HIGH);
     digitalWrite(motorPin2[x], HIGH);
