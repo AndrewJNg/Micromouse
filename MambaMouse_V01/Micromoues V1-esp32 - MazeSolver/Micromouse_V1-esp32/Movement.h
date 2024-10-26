@@ -53,7 +53,7 @@ void motor(int speedLeft, int speedRight)
     }
 
   }
-  //enc_motor_update();
+  enc_motor_update();
 
 }
 

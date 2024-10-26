@@ -44,7 +44,7 @@ int rightWall = 50;
 #include "Infrared.h"
 #include "Memory.h"  // store IR values
 
-#include "AS5600.h"
+#include "AS5600_mod.h"
 #include "MPU6050.h"
 #include "Movement.h"
 #include "PID.h"
@@ -83,8 +83,8 @@ void setup() {
 
 void loop() {
   system();
-  Start = 1;
-  Mode = 4;
+  // Start = 1;
+  // Mode = 4;
   
   if (Start) {
     if (Mode == 1) {  // First search for new map
