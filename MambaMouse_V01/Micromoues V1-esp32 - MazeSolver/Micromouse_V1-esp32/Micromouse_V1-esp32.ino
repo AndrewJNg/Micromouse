@@ -46,6 +46,7 @@ int rightWall = 50;
 
 #include "AS5600_mod.h"
 #include "MPU6050.h"
+
 #include "Movement.h"
 #include "PID.h"
 
@@ -69,9 +70,11 @@ void setup() {
   IR_setup();
   read_memory();
   
+  // delay(1000);
   Enc_setup();
   Gyro_setup();
   
+  delay(500);
   PS3_setup();
   
   PID_setup();
@@ -83,8 +86,6 @@ void setup() {
 
 void loop() {
   system();
-  // Start = 1;
-  // Mode = 4;
   
   if (Start) {
     if (Mode == 1) {  // First search for new map
@@ -100,6 +101,7 @@ void loop() {
     } else if (Mode == 2) {  // Speed Run
 
       align_to_front_wall();
+
 
       // printMap();
       // first_Search();
@@ -136,8 +138,8 @@ void loop() {
       // PS3 movement
       OLED_display_stats();
 
-      int Speed = map(PS3_LeftAnalogStickSpeed(stick_LY), -255, 255, -200, 200);
-      int Diff = map(PS3_LeftAnalogStickSpeed(stick_RX), -255, 255, -200, 200);
+      int Speed = map(PS3_LeftAnalogStickSpeed(stick_LY), -255, 255, -4000, 4000);
+      int Diff = map(PS3_LeftAnalogStickSpeed(stick_RX), -255, 255, -4000, 4000);
       // rpmMove(Speed + Diff, Speed - Diff);
       motor(Speed + Diff, Speed - Diff);
       // motor(0,0);

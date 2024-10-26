@@ -117,7 +117,7 @@ float PS3_LeftAnalogStickSpeed(int Y) {
   //  if (abs(X) > 15) X_vector = map(X, -128, 127, -10000, 10000) / 100;
   //  else LX_vector = 0;
   //  if (abs(LY) > 15) LY_vector = map(LY, -127, 128, -10000, 10000) / 100;
-  if (abs(Y) > 15) Y_vector = map(Y, -127, 128, -25500, 25500) / 100;
+  if (abs(Y) > 15) Y_vector = map(Y, -127, 128, -PWM_resolution_max_value*100, PWM_resolution_max_value*100) / 100;
   //  else LY_vector = 0;
 
   //  float Speed = sqrt(LX_vector * LX_vector + LY_vector * LY_vector);
@@ -132,7 +132,7 @@ void PS3_setup() {
   Ps3.attach(notify);
   Ps3.attachOnConnect(onConnect);
   //  Ps3.begin("01:02:03:04:05:06");
+  Ps3.begin("aa:aa:aa:aa:aa:aa");
   //  Ps3.begin("bb:bb:bb:bb:bb:bb");
   // Ps3.begin("cc:cc:cc:cc:cc:cc");
-  Ps3.begin("aa:aa:aa:aa:aa:aa");
 }

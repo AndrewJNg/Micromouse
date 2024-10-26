@@ -25,19 +25,19 @@ void PID_setup()
 
   leftMotorVel.SetMode(AUTOMATIC);
   leftMotorVel.SetSampleTime(1);
-  leftMotorVel.SetOutputLimits(-255, 255);
+  leftMotorVel.SetOutputLimits(-PWM_resolution_max_value, PWM_resolution_max_value);
 
   rightMotorVel.SetMode(AUTOMATIC);
   rightMotorVel.SetSampleTime(1);
-  rightMotorVel.SetOutputLimits(-255, 255);
+  rightMotorVel.SetOutputLimits(-PWM_resolution_max_value, PWM_resolution_max_value);
 
 ///////////////////////////////////////////////////////////////////////////////////
 
   turnPID.SetMode(AUTOMATIC);
   turnPID.SetSampleTime(1);
-  turnPID.SetOutputLimits(-100, 100);  // turn speed
+  turnPID.SetOutputLimits(-PWM_resolution_max_value, PWM_resolution_max_value);  // turn speed
 
   straightPID.SetMode(AUTOMATIC);
   straightPID.SetSampleTime(1);
-  straightPID.SetOutputLimits(-255, 255);  // turn speed
+  straightPID.SetOutputLimits(-PWM_resolution_max_value, PWM_resolution_max_value);  // turn speed
 }

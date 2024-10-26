@@ -1,15 +1,11 @@
 
-// float v1Filt = 0;
-// float v1Prev = 0;
-// float v2Filt = 0;
-// float v2Prev = 0;
-
 int prevCountLeft = 0;
 int prevCountRight = 0;
 unsigned long EncPrevMicro = 0;
 
+//low pass filter at 5Hz, sample at 1kHz
 LowPass<1> lpLeft(5, 1e3, true);
-LowPass<1> lpRight(5, 1e3, true);
+LowPass<1> lpRight(5, 1e3, true); 
 
 void rpmMove(float target_rpm_left, float target_rpm_right) {
 
