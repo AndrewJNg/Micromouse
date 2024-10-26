@@ -1,0 +1,3 @@
+[submodule "Simulator/maze/mazefiles"]
+	path = Simulator/maze/mazefiles
+	url = https://github.com/micromouseonline/mazefiles.git
