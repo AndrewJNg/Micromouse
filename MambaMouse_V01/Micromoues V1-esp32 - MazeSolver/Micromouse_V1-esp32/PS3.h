@@ -24,7 +24,7 @@ void notify() {
     stick_RY = -Ps3.data.analog.stick.ry;
   }
 
-  if (Ps3.event.button_down.ps) ESP.restart();
+  // if (Ps3.event.button_down.ps) ESP.restart();
   
 
   if (Ps3.event.button_down.select) Start = false;
@@ -45,14 +45,14 @@ void notify() {
   // if (Ps3.event.button_down.square) turn(-90);
 
 
-   if ( Ps3.event.button_down.triangle )KpLeft = KpLeft + 0.01;
-   if ( Ps3.event.button_down.cross )KpLeft = KpLeft - 0.01;
+   if ( Ps3.event.button_down.triangle )KpLeft = KpLeft + 1;
+   if ( Ps3.event.button_down.cross )KpLeft = KpLeft - 1;
   
-   if ( Ps3.event.button_down.right )KiLeft = KiLeft + 2;
-   if ( Ps3.event.button_down.left )KiLeft = KiLeft - 2;
+   if ( Ps3.event.button_down.right )KiLeft = KiLeft + 0.1;
+   if ( Ps3.event.button_down.left )KiLeft = KiLeft - 0.1;
   
-   if ( Ps3.event.button_down.circle )KdLeft = KdLeft + 0.00001;
-   if ( Ps3.event.button_down.square )KdLeft = KdLeft - 0.00001;
+   if ( Ps3.event.button_down.circle )KdLeft = KdLeft + 0.01;
+   if ( Ps3.event.button_down.square )KdLeft = KdLeft - 0.01;
 
   //  if ( Ps3.event.button_down.triangle )turnKp = turnKp + 0.1;
   //  if ( Ps3.event.button_down.cross )turnKp = turnKp - 0.1;
@@ -87,7 +87,7 @@ void notify() {
 }
 
 void onConnect() {
-  //  Serial.println("Connected.");
+   Serial.println("Connected.");
 }
 
 float PS3_LeftAnalogStickAngle(int LX, int LY) {
@@ -117,7 +117,7 @@ float PS3_LeftAnalogStickSpeed(int Y) {
   //  if (abs(X) > 15) X_vector = map(X, -128, 127, -10000, 10000) / 100;
   //  else LX_vector = 0;
   //  if (abs(LY) > 15) LY_vector = map(LY, -127, 128, -10000, 10000) / 100;
-  if (abs(Y) > 15) Y_vector = map(Y, -127, 128, -PWM_resolution_max_value*100, PWM_resolution_max_value*100) / 100;
+  if (abs(Y) > 15) Y_vector = map(Y, -127, 128, -PWMResolutionMaxValue*100, PWMResolutionMaxValue*100) / 100;
   //  else LY_vector = 0;
 
   //  float Speed = sqrt(LX_vector * LX_vector + LY_vector * LY_vector);
@@ -129,10 +129,16 @@ float PS3_LeftAnalogStickSpeed(int Y) {
 }
 
 void PS3_setup() {
+  
+      Serial.println("Start ps3 0");
   Ps3.attach(notify);
+      Serial.println("Start ps3 1");
   Ps3.attachOnConnect(onConnect);
+      Serial.println("Start ps3 2");
   //  Ps3.begin("01:02:03:04:05:06");
+  delay(100);
   Ps3.begin("aa:aa:aa:aa:aa:aa");
+      Serial.println("Start ps3 3");
   //  Ps3.begin("bb:bb:bb:bb:bb:bb");
   // Ps3.begin("cc:cc:cc:cc:cc:cc");
 }

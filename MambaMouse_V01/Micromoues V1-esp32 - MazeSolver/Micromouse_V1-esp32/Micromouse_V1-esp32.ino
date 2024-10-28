@@ -23,12 +23,13 @@ unsigned long StartTimer = 0;
 
 //double Kp = 1.8, Ki = 1.8, Kd = 0.12;
 //double Kp = 5, Ki = 4.5, Kd = 0.03;
-double KpLeft = 0.5, KiLeft = 0, KdLeft = 0.005;
+double KpLeft = 10, KiLeft = 0, KdLeft = 0.00;
 double KpRight = 5, KiRight = 5.1, KdRight = 0.03;
 
 //double turnKp = 2, turnKi = 0, turnKd = 0.000;
 //double turnKp = 1, turnKi = 2, turnKd = 0.001;
-double turnKp = 1, turnKi = 2, turnKd = 0.0001;
+// double turnKp = 1, turnKi = 2, turnKd = 0.0001;
+// double turnKp = 1, turnKi = 0, turnKd = 0.0000;
 
 double straightKp = 1, straightKi = 0, straightKd = 0;
 
@@ -42,43 +43,40 @@ int rightWall = 50;
 #include <Wire.h>
 
 #include "Infrared.h"
+#include "MPU6050.h"
+#include "Motor_Subsystem.h"
+
 #include "Memory.h"  // store IR values
 
-#include "AS5600_mod.h"
-#include "MPU6050.h"
-
-#include "Movement.h"
-#include "PID.h"
+// #include "PID.h"
 
 #include "lowPass.h"
-#include "Speed_profile.h"
-#include "Cell_movement.h"
+// #include "Speed_profile.h"
+// #include "Cell_movement.h"
 #include "PS3.h"
 
 #include "User_interface.h"
 #include "OLED.h"
 
-#include "FloodFill.h"
+// #include "FloodFill.h"
 
 void setup() {
 
   Serial.begin(115200);
   
-  Motor_setup();
+  motor_subsystem_setup();
+  
+  PS3_setup();
   OLED_setup();
   
   IR_setup();
   read_memory();
-  
-  // delay(1000);
-  Enc_setup();
   Gyro_setup();
   
-  delay(500);
-  PS3_setup();
   
-  PID_setup();
-  FloodFill_setup();
+  
+  // PID_setup();
+  // FloodFill_setup();
   
   }
 
@@ -89,18 +87,45 @@ void loop() {
   
   if (Start) {
     if (Mode == 1) {  // First search for new map
-      clearMap();
-      printMap();
-      first_Search();
-      Start = false;
-      
+      // clearMap();
+      // printMap();
+      // first_Search();
+      // Start = false;
+      // leftMotor.setMotorSpeed(1500);
+      // rightMotor.setMotorSpeed(1500);
+
+      // delay(50);
+      // Serial.print("leftMotor: ");
+      // Serial.print(leftMotor.updateEncoder());
+      // Serial.print("    rightMotor: ");
+      // Serial.println(rightMotor.updateEncoder());
+
+      // Serial.print("leftMotor: ");
+      // Serial.print(leftMotor.angle_2_mm());
+      // Serial.print("    rightMotor: ");
+      // Serial.println(rightMotor.angle_2_mm());
+
+    // leftMotor.PID_Kp = KpLeft;
+    // leftMotor.PID_Ki = KiLeft;
+    // leftMotor.PID_Kd = KdLeft;
+    
+    // rightMotor.PID_Kp = KpLeft;
+    // rightMotor.PID_Ki = KiLeft;
+    // rightMotor.PID_Kd = KdLeft;
+//  leftMotor.setMotorPWM(4095);
+//  rightMotor.setMotorPWM(4095);
+      rightMotor.setSpeed(750);
+      leftMotor.setSpeed(750);
+      OLED_display_stats();
 
 
 
 
     } else if (Mode == 2) {  // Speed Run
-
-      align_to_front_wall();
+      generateStepResponse();
+      Start=0;
+      // rightMotor.setSpeed(500);
+      // align_to_front_wall();
 
 
       // printMap();
@@ -113,23 +138,23 @@ void loop() {
 
 
     } else if (Mode == 3) {  // Calibration
-      unsigned long IR_calibrate_start = millis();
+      // unsigned long IR_calibrate_start = millis();
 
-      // reset values
-      for (int i = 0; i < sizeof(IREmitPin); i++) {
-        minIR[i] = 4095;
-        maxIR[i] = 0;
-      }
+      // // reset values
+      // for (int i = 0; i < sizeof(IREmitPin); i++) {
+      //   minIR[i] = 4095;
+      //   maxIR[i] = 0;
+      // }
 
-      // run calibration for 10 seconds
-      do {
-        calibration();
-        IR_update();
-        OLED_display_stats();
-      } while ((millis() - IR_calibrate_start) <= 10000);
+      // // run calibration for 10 seconds
+      // do {
+      //   calibration();
+      //   IR_update();
+      //   OLED_display_stats();
+      // } while ((millis() - IR_calibrate_start) <= 10000);
 
-      store_memory_IR();
-      Start = false;
+      // store_memory_IR();
+      // Start = false;
 
 
 
@@ -141,15 +166,15 @@ void loop() {
       int Speed = map(PS3_LeftAnalogStickSpeed(stick_LY), -255, 255, -4000, 4000);
       int Diff = map(PS3_LeftAnalogStickSpeed(stick_RX), -255, 255, -4000, 4000);
       // rpmMove(Speed + Diff, Speed - Diff);
-      motor(Speed + Diff, Speed - Diff);
+      // motor(Speed + Diff, Speed - Diff);
       // motor(0,0);
     }
   } else {// Menu operation
-  
-    //rpmMove(0, 0);
-    motor(0, 0);
-    OLED_menu_display();
+    
+    leftMotor.stopMotor();
+    rightMotor.stopMotor();
 
+    OLED_menu_display();
     encoderMode();
     // IR_left_menu.count(left_IR_button(), &Mode, 1);
     IR_right_menu.count(right_IR_button(), &Start, 1);

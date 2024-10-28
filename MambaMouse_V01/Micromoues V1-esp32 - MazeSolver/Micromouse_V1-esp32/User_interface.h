@@ -83,14 +83,14 @@ bool right_IR_button() {
 
 int enc_clickCount = 4096 / 8;  // count needed to switch to a different mode (one rotation can click through 8 modes)
 void encoderMode() {
-  static long previousAngle = currAngle[0];
+  static long previousAngle = leftMotor.updateEncoder();
 
-
-  if ((currAngle[0] - previousAngle) > enc_clickCount) {
-    previousAngle = currAngle[0];
+  double currentAngle =  leftMotor.updateEncoder();
+  if ((currentAngle - previousAngle) > enc_clickCount) {
+    previousAngle = currentAngle;
     Mode++;
-  } else if ((currAngle[0] - previousAngle) < -enc_clickCount) {
-    previousAngle = currAngle[0];
+  } else if ((currentAngle - previousAngle) < -enc_clickCount) {
+    previousAngle = currentAngle;
     Mode--;
   }
 }

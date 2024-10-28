@@ -368,6 +368,7 @@ void OLED_display_stats()
     OLED.print(IRVal[2],0);
     OLED.print("  ");
     OLED.println(IRVal[3],0);
+    
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Gyro
@@ -396,6 +397,27 @@ void OLED_display_stats()
     OLED.println(gyroZ,2);
     
 
+    // OLED.print("L: ");  
+    // OLED.print(leftMotor.angle2mm());
+    // OLED.print(" R: ");  
+    // OLED.println(rightMotor.angle2mm());
+
+  
+
+    // OLED.print("L: ");  
+    // OLED.print(leftMotor.updateEncoder());
+    // OLED.print(" R: ");  
+    // OLED.println(rightMotor.updateEncoder());
+            
+    OLED.print("L: ");  
+    OLED.print(leftMotor.measured_velocity);
+    OLED.print(" R: ");  
+    OLED.println(rightMotor.measured_velocity);
+    
+    // OLED.print("L: ");  
+    // OLED.print(leftMotor.err);
+    // OLED.print(" R: ");  
+    // OLED.println(rightMotor.err);
     
     /*
      
