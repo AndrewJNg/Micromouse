@@ -1,5 +1,6 @@
 #include <AS5600.h>  // https://github.com/RobTillaart/AS5600
 #include <cmath>
+#include "lowPass.h"
 
 // Encoder parameters
 #define wheelRadius 17.0
@@ -24,6 +25,12 @@
 
 class MotorControl {
 private:
+    // Classes used
+    AS5600 encoder;
+
+    //low pass filter at 5Hz, sample at 100Hz
+    LowPass<1> lowPassFilter; 
+
     // Encoder properties
     int currAngle = 0;
     int prevAngle = 0;
@@ -39,7 +46,6 @@ private:
     
     // System setup
     int motor_update_interval =0; // matches motor_update_freq in time interval (updated in setup)
-    AS5600 encoder;
 
 
     double integral_error = 0;
@@ -74,7 +80,9 @@ public:
         motorPin2(pin2), 
         motorPWM(pwm), 
         motorChannel(channel), 
-        encoder(&wire) {}
+        encoder(&wire),
+        lowPassFilter(5, motor_update_freq, true)
+        {}
 
     void setupEncoder(bool clockwise) {
         encoder.begin();
@@ -95,21 +103,22 @@ public:
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Encoder distance
     double updateEncoder() {
-        currAngle = encoder.readAngle();
-        // currAngle = isclockwise ? encoder.readAngle() : 4095 - encoder.readAngle();
+        /////////////////// Manual cummulative calculation ///////////////
+        // currAngle = encoder.readAngle();
 
-        if (prevAngle >= 3072 && currAngle <= 1024) multiplyAngle++;
-        else if (prevAngle <= 1024 && currAngle >= 3072) multiplyAngle--;
+        // if (prevAngle >= 3072 && currAngle <= 1024) multiplyAngle++;
+        // else if (prevAngle <= 1024 && currAngle >= 3072) multiplyAngle--;
 
-        prevAngle = currAngle;
-        currAngle += multiplyAngle * 4096;
-        return currAngle;
+        // prevAngle = currAngle;
+        // currAngle += multiplyAngle * 4096;
+
+        /////////////////// Library cummulative calculation ///////////////
+        currAngle = encoder.getCumulativePosition(1);
+        return lowPassFilter.filt(currAngle);
     }
 
     double angle2mm(){
-        // return (2 * M_PI * wheelRadius * (double) updateEncoder()) / encoder_tick_per_rev;
-        return (2 * M_PI * wheelRadius * (double) encoder.getCumulativePosition(1)) / encoder_tick_per_rev;
-        
+        return (2 * M_PI * wheelRadius * (double) updateEncoder()) / encoder_tick_per_rev;
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,11 +157,11 @@ public:
             measured_velocity = (curr_distance - prev_distance) / time_elapsed; // mm/s
 
             ////////////////////////// RPM /////////////////////////////////////
-            // curr_distance = encoder.getCumulativePosition(1);
+            // curr_distance = updateEncoder();
             // double time_elapsed = (currentMillis - prevMillis) / 1000.0; // Convert ms to seconds 
             // measured_velocity = (60*(curr_distance - prev_distance) )/ (time_elapsed*4096); // mm/s
 
-
+            //////////////////////////////////////////////////////////////////////////////
             // Serial.print("time: ");  
             // Serial.print(currentMillis);
             // Serial.print("prev: ");  
@@ -163,8 +172,8 @@ public:
             // Serial.print("prev: ");  
             // Serial.print(prev_distance);
 
-            Serial.print("  Speed: ");  
-            Serial.println(measured_velocity);
+            // Serial.print("  Speed: ");  
+            // Serial.println(measured_velocity);
 
             prevMillis = currentMillis;
             prev_distance = curr_distance;
@@ -311,14 +320,12 @@ void generateStepResponse(){
   
   leftMotor.resetPID();  
   rightMotor.resetPID();
+  
   generateStepAtPWM(4095);
   generateStepAtPWM(3072);
   generateStepAtPWM(2048);
   generateStepAtPWM(1024);
   generateStepAtPWM(0);
-
-  //Km
-  //Tm
 
   leftMotor.setMotorPWM(0);
   rightMotor.setMotorPWM(0);

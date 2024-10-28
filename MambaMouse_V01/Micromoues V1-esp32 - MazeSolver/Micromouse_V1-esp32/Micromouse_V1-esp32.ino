@@ -2,7 +2,7 @@
 This is for a cheap but capable maze solving robot (below RM200) with sufficient hardware to perform high level speed control 
 - ESP32 microcontroller with bluetooth capabilities for wireless control with PS3
 - 12 bit magnetic encoder (AS5600 - I2C)
-- 600RPM N20 motors
+- 650RPM N20 motors
 - TB6612FNG motor driver
 - 6 IR sensor pairs (TEFT4300 phototransistor, TSAL4400 emitter) 
 - MPU6050 gyroscope (I2C)
@@ -21,22 +21,7 @@ int Start = false;
 
 unsigned long StartTimer = 0;
 
-//double Kp = 1.8, Ki = 1.8, Kd = 0.12;
-//double Kp = 5, Ki = 4.5, Kd = 0.03;
 double KpLeft = 10, KiLeft = 0, KdLeft = 0.00;
-double KpRight = 5, KiRight = 5.1, KdRight = 0.03;
-
-//double turnKp = 2, turnKi = 0, turnKd = 0.000;
-//double turnKp = 1, turnKi = 2, turnKd = 0.001;
-// double turnKp = 1, turnKi = 2, turnKd = 0.0001;
-// double turnKp = 1, turnKi = 0, turnKd = 0.0000;
-
-double straightKp = 1, straightKi = 0, straightKd = 0;
-
-double rpmSetLeft, InputRpmLeft, OutputLeftMotor;
-double rpmSetRight, InputRpmRight, OutputRightMotor;
-double turnSetpoint, turnInput, turnOutput;
-double straightSetpoint, straightInput, straightOutput;
 
 int leftWall = 50;
 int rightWall = 50;
@@ -48,10 +33,6 @@ int rightWall = 50;
 
 #include "Memory.h"  // store IR values
 
-// #include "PID.h"
-
-#include "lowPass.h"
-// #include "Speed_profile.h"
 // #include "Cell_movement.h"
 #include "PS3.h"
 
@@ -65,17 +46,14 @@ void setup() {
   Serial.begin(115200);
   
   motor_subsystem_setup();
-  
   PS3_setup();
+
   OLED_setup();
   
   IR_setup();
   read_memory();
   Gyro_setup();
   
-  
-  
-  // PID_setup();
   // FloodFill_setup();
   
   }
@@ -91,29 +69,7 @@ void loop() {
       // printMap();
       // first_Search();
       // Start = false;
-      // leftMotor.setMotorSpeed(1500);
-      // rightMotor.setMotorSpeed(1500);
 
-      // delay(50);
-      // Serial.print("leftMotor: ");
-      // Serial.print(leftMotor.updateEncoder());
-      // Serial.print("    rightMotor: ");
-      // Serial.println(rightMotor.updateEncoder());
-
-      // Serial.print("leftMotor: ");
-      // Serial.print(leftMotor.angle_2_mm());
-      // Serial.print("    rightMotor: ");
-      // Serial.println(rightMotor.angle_2_mm());
-
-    // leftMotor.PID_Kp = KpLeft;
-    // leftMotor.PID_Ki = KiLeft;
-    // leftMotor.PID_Kd = KdLeft;
-    
-    // rightMotor.PID_Kp = KpLeft;
-    // rightMotor.PID_Ki = KiLeft;
-    // rightMotor.PID_Kd = KdLeft;
-//  leftMotor.setMotorPWM(4095);
-//  rightMotor.setMotorPWM(4095);
       rightMotor.setSpeed(750);
       leftMotor.setSpeed(750);
       OLED_display_stats();

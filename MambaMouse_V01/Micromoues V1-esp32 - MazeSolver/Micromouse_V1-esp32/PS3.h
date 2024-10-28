@@ -13,23 +13,21 @@ int PS3Batt;
 int PS3Select;
 
 void notify() {
+  // Analog sticks
   if (abs(Ps3.event.analog_changed.stick.lx) + abs(Ps3.event.analog_changed.stick.ly) > 2) {
     stick_LX = Ps3.data.analog.stick.lx;
     stick_LY = -Ps3.data.analog.stick.ly;
   }
-
 
   if (abs(Ps3.event.analog_changed.stick.rx) + abs(Ps3.event.analog_changed.stick.ry) > 2) {
     stick_RX = Ps3.data.analog.stick.rx;
     stick_RY = -Ps3.data.analog.stick.ry;
   }
 
-  // if (Ps3.event.button_down.ps) ESP.restart();
-  
-
+  // UI commands
   if (Ps3.event.button_down.select) Start = false;
   if (Ps3.event.button_down.start) Start = true;
-  //        Serial.println("Started pressing the select button");
+  
   if (Ps3.event.button_down.up) {
     Mode++;
     Start = false;
@@ -38,6 +36,8 @@ void notify() {
     Mode--;
     Start = false;
   }
+
+  //---------------------- Tuning -------------------------
   // if (Ps3.event.button_down.triangle) move_forward_cells();
   // if (Ps3.event.button_down.cross) align_to_front_wall();
 
@@ -54,24 +54,6 @@ void notify() {
    if ( Ps3.event.button_down.circle )KdLeft = KdLeft + 0.01;
    if ( Ps3.event.button_down.square )KdLeft = KdLeft - 0.01;
 
-  //  if ( Ps3.event.button_down.triangle )turnKp = turnKp + 0.1;
-  //  if ( Ps3.event.button_down.cross )turnKp = turnKp - 0.1;
-  
-  //  if ( Ps3.event.button_down.right )turnKi = turnKi + 2;
-  //  if ( Ps3.event.button_down.left )turnKi = turnKi - 2;
-  
-  //  if ( Ps3.event.button_down.circle )turnKd = turnKd + 0.0001;
-  //  if ( Ps3.event.button_down.square )turnKd = turnKd - 0.0001;
-  /*
-   if ( Ps3.event.button_down.triangle )straightKp = straightKp + 0.1;
-   if ( Ps3.event.button_down.cross )straightKp = straightKp - 0.1;
-
-   if ( Ps3.event.button_down.right )straightKi = straightKi + 0.1;
-   if ( Ps3.event.button_down.left )straightKi = straightKi - 0.1;
-
-   if ( Ps3.event.button_down.circle )straightKd = straightKd + 0.001;
-   if ( Ps3.event.button_down.square )straightKd = straightKd - 0.001;
- */
   //---------------------- Battery events ---------------------
   if (battery != Ps3.data.status.battery) {
     battery = Ps3.data.status.battery;
@@ -130,15 +112,11 @@ float PS3_LeftAnalogStickSpeed(int Y) {
 
 void PS3_setup() {
   
-      Serial.println("Start ps3 0");
   Ps3.attach(notify);
-      Serial.println("Start ps3 1");
   Ps3.attachOnConnect(onConnect);
-      Serial.println("Start ps3 2");
-  //  Ps3.begin("01:02:03:04:05:06");
   delay(100);
   Ps3.begin("aa:aa:aa:aa:aa:aa");
-      Serial.println("Start ps3 3");
   //  Ps3.begin("bb:bb:bb:bb:bb:bb");
   // Ps3.begin("cc:cc:cc:cc:cc:cc");
-}
+  //  Ps3.begin("01:02:03:04:05:06");
+  }
