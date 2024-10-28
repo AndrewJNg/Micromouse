@@ -45,14 +45,14 @@ void notify() {
   // if (Ps3.event.button_down.square) turn(-90);
 
 
-   if ( Ps3.event.button_down.triangle )KpLeft = KpLeft + 1;
-   if ( Ps3.event.button_down.cross )KpLeft = KpLeft - 1;
+   if ( Ps3.event.button_down.triangle )KpLeft = KpLeft + 0.01;
+   if ( Ps3.event.button_down.cross )KpLeft = KpLeft - 0.01;
   
    if ( Ps3.event.button_down.right )KiLeft = KiLeft + 0.1;
    if ( Ps3.event.button_down.left )KiLeft = KiLeft - 0.1;
   
-   if ( Ps3.event.button_down.circle )KdLeft = KdLeft + 0.01;
-   if ( Ps3.event.button_down.square )KdLeft = KdLeft - 0.01;
+   if ( Ps3.event.button_down.circle )KdLeft = KdLeft + 0.001;
+   if ( Ps3.event.button_down.square )KdLeft = KdLeft - 0.001;
 
   //---------------------- Battery events ---------------------
   if (battery != Ps3.data.status.battery) {

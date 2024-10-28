@@ -1,6 +1,7 @@
 
 fclose all; close all; clear all; clc;% Load data with original column names
-data = readtable('encoder_data6.csv', 'VariableNamingRule', 'preserve');
+% data = readtable('encoder_data9.csv', 'VariableNamingRule', 'preserve');
+data = readtable('encoder_data15.csv', 'VariableNamingRule', 'preserve');
 
 % data = readtable('step_half.csv', 'VariableNamingRule', 'preserve');
 
@@ -15,7 +16,7 @@ rightPosition = data.("rightEncoderCount");
 
 % Convert time to seconds and calculate velocity
 time = time / 1000; 
-time_diff = diff(time)
+time_diff = diff(time);
 leftVelocity = diff(leftPosition) ./ time_diff;
 rightVelocity = diff(rightPosition) ./ time_diff;
 
@@ -97,30 +98,30 @@ xlabel('Time (s)');
 ylabel('Velocity (mm/s)');
 title('Low-Pass Filtered Motor Velocities (5 Hz Cutoff)');
 legend;
+% xlim([0,0.2])
 grid on;
 hold off;
 %%
-
 % Calculate frequency response for left and right motor velocities
 Fs = 1 / mean(time_diff);  % Sampling frequency
-n = length(filteredLeftVelocity); % Number of samples
+n = length(leftVelocity); % Number of samples
 
 % Frequency axis centered around zero
 f = (-n/2:n/2-1) * (Fs/n);
 
 % FFT of the filtered velocity signals and shift zero frequency component to center
-leftVelocity_fft = fftshift(abs(fft(filteredLeftVelocity)));
-rightVelocity_fft = fftshift(abs(fft(filteredRightVelocity)));
+leftVelocity_fft = fftshift(abs(fft(leftVelocity)));
+rightVelocity_fft = fftshift(abs(fft(rightVelocity)));
 
-% Plot frequency response of the motor velocities
+% Plot frequency response of the motor velocities using scatter plot
 subplot(4, 1, 4);
 hold on;
-plot(f, leftVelocity_fft, 'b-', 'DisplayName', 'Left Motor Velocity Frequency Response');
-plot(f, rightVelocity_fft, 'r-', 'DisplayName', 'Right Motor Velocity Frequency Response');
+scatter(f, leftVelocity_fft, 'b', 'DisplayName', 'Left Motor Velocity Frequency Response');
+scatter(f, rightVelocity_fft, 'r', 'DisplayName', 'Right Motor Velocity Frequency Response');
 xlabel('Frequency (Hz)');
 ylabel('Amplitude');
 title('Frequency Response of Motor Velocity');
-xlim([-10 10]); % Center plot between -10 and 10 Hz
+xlim([-2 2]); % Center plot between -10 and 10 Hz
 legend;
 grid on;
 hold off;

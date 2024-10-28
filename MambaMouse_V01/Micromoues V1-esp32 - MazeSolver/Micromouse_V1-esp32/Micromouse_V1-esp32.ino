@@ -21,7 +21,7 @@ int Start = false;
 
 unsigned long StartTimer = 0;
 
-double KpLeft = 10, KiLeft = 0, KdLeft = 0.00;
+double KpLeft = 8, KiLeft = 0, KdLeft = 0.02;
 
 int leftWall = 50;
 int rightWall = 50;
@@ -70,6 +70,12 @@ void loop() {
       // first_Search();
       // Start = false;
 
+  // leftMotor.PID_Kp = KpLeft;
+    // leftMotor.PID_Kp = KpLeft;//7.00;// (leftMotor.Tm * 64.0) / (leftMotor.FF_K_velocity * (double)sqrt(2.0)*sqrt(2.0) * Td * Td);
+    // // leftMotor.PID_Kp = KpLeft;
+    // leftMotor.PID_Ki = 0;
+    // leftMotor.PID_Kd = KdLeft;//0.02;//(8 * leftMotor.Tm - Td) / (Td * leftMotor.FF_K_velocity);
+    
       rightMotor.setSpeed(750);
       leftMotor.setSpeed(750);
       OLED_display_stats();
@@ -94,6 +100,26 @@ void loop() {
 
 
     } else if (Mode == 3) {  // Calibration
+    MotionParameters motionParams;
+    MotionParameters motionParams2;
+    motionParams = leftMotor.calculateTrapezoidalProfile(100, 500, 200);
+    motionParams2 = rightMotor.calculateTrapezoidalProfile(100, 500, 200);
+
+    while((motionParams.time_step < (motionParams.T)) && Start==1){
+    // while(1){
+      // Serial.print("  ");
+      // Serial.print(motionParams.prev_time);
+      // Serial.print("  ");
+      // Serial.print(motionParams.time_step);
+      // Serial.print("  ");
+      // Serial.print(motionParams.T);
+      // Serial.println("  ");
+      leftMotor.followProfile(&motionParams);
+      rightMotor.followProfile(&motionParams);
+    }
+      Start=0;
+
+
       // unsigned long IR_calibrate_start = millis();
 
       // // reset values

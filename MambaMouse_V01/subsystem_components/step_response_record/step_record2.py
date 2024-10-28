@@ -5,7 +5,7 @@ import time
 # Replace 'COM3' with your Arduino port (e.g., 'COM4' on Windows or '/dev/ttyUSB0' on Linux)
 arduino_port = 'COM5'
 baud_rate = 115200  # Ensure this matches your Arduino's serial settings
-csv_file = 'encoder_data6.csv'
+csv_file = 'encoder_data15.csv'
 
 # Open serial connection
 ser = serial.Serial(arduino_port, baud_rate, timeout=1)
