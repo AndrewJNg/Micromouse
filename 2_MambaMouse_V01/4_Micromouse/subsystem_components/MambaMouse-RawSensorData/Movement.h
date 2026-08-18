@@ -33,19 +33,19 @@ void motor(int Speed[])
     { // Forward
       digitalWrite(motorPin1[x], HIGH);
       digitalWrite(motorPin2[x], LOW);
-      ledcWrite(motorChannel[x] , abs(Speed[x]));
+      ledcWrite(motorPWM[x] , abs(Speed[x]));
     }
     else if (Speed[x] < 0)
     { // Reverse
       digitalWrite(motorPin1[x], LOW);
       digitalWrite(motorPin2[x], HIGH);
-      ledcWrite(motorChannel[x] , abs(Speed[x]));
+      ledcWrite(motorPWM[x] , abs(Speed[x]));
     }
     else
     { //Stop
       digitalWrite(motorPin1[x], HIGH);
       digitalWrite(motorPin2[x], HIGH);
-      ledcWrite(motorChannel[x] , 0);
+      ledcWrite(motorPWM[x] , 0);
     }
   }
   
@@ -68,7 +68,8 @@ void Movement_setup()
   {
     pinMode(motorPin1[x], OUTPUT);
     pinMode(motorPin2[x], OUTPUT);
-    ledcSetup(motorChannel[x], 5000, PWM_resolution);
-    ledcAttachPin(motorPWM[x] , motorChannel[x] );
+    // ledcSetup(motorChannel[x], 5000, PWM_resolution);
+    // ledcAttachPin(motorPWM[x] , motorChannel[x] );
+    ledcAttach(motorPWM[x], 5000, PWM_resolution);
   }
 }

@@ -20,18 +20,21 @@ class IR_sensor {
       a = value1;
       b = value2;
       emitter_pin = emitter;
-//      pinMode(emitter_pin, OUTPUT);
+     pinMode(emitter_pin, OUTPUT);
     }
 
     double Distance()
     {
       //retrieve IR reading samples
-//      digitalWrite(emitter_pin, HIGH);
+     digitalWrite(emitter_pin, HIGH);
+      delayMicroseconds(200);
       for ( int i = 0; i < point_num; i++ )
       {
-        values[i] = 1023 - analogRead(IR_pin);
+        // values[i] = 4095 - analogRead(IR_pin);
+        values[i] = analogRead(IR_pin);
       }
-//      digitalWrite(emitter_pin, LOW);
+      delayMicroseconds(200);
+     digitalWrite(emitter_pin, LOW);
 
       // obtain average value
       sum = 0;
@@ -41,15 +44,18 @@ class IR_sensor {
       }
       average = sum / point_num;
 
-  Serial.print(average);
-  Serial.print("    ");
+  // Serial.print(average);
+  // Serial.print("    ");
       //convert readings to distance in mm
       //      Serial.print(average);
       //      Serial.print("    ");
       int y = average;
-      double reading = a / (y - b);
+      // double reading = a / (y - b);
+
+      double reading = a/log10(y) - b;
       //reading = 1/reading;
       //      double output = 36.8701/(1.0312e3*((1/y)-(1/1.0312e3)));
+      // return y ;
       return reading ;
     }
 

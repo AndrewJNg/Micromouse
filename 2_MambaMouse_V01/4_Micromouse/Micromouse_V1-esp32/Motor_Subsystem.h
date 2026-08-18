@@ -115,8 +115,9 @@ public:
   void setupMotor(int direction = 1) {
     pinMode(motorPin1, OUTPUT);
     pinMode(motorPin2, OUTPUT);
-    ledcSetup(motorChannel, 5000, PWMResolution);
-    ledcAttachPin(motorPWM, motorChannel);
+    // ledcSetup(motorChannel, 5000, PWMResolution);
+    // ledcAttachPin(motorPWM, motorChannel);
+    ledcAttach(motorPWM, 5000, PWMResolution);
     stopMotor();
     drive_dir = (direction == 1 || direction == -1) ? direction : 1;  // Ensure drive_dir is either 1 or -1
     motor_update_interval = 1000 / motor_update_freq;                 //in ms
@@ -143,13 +144,15 @@ public:
     {
       digitalWrite(motorPin1, LOW);
       digitalWrite(motorPin2, HIGH);
-      ledcWrite(motorChannel, abs(speed));
+      // ledcWrite(motorChannel, abs(speed));
+      ledcWrite(motorPWM, abs(speed));
     }
     else if (speed < 0) 
     {
       digitalWrite(motorPin1, HIGH);
       digitalWrite(motorPin2, LOW);
-      ledcWrite(motorChannel, abs(speed));
+      // ledcWrite(motorChannel, abs(speed));
+      ledcWrite(motorPWM, abs(speed));
     }
     else stopMotor();
   }
@@ -157,7 +160,8 @@ public:
   {
       digitalWrite(motorPin1, HIGH);
       digitalWrite(motorPin2, HIGH);
-      ledcWrite(motorChannel, 0);
+      // ledcWrite(motorChannel, 0);
+      ledcWrite(motorPWM, 0);
 
   }
 
