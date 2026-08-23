@@ -108,7 +108,7 @@ public:
 
 // System speed
 #define i2c_speed 400000
-#define motor_update_freq 200  // 100Hz -> update time -> 10ms
+#define motor_update_freq 200.0  // 100Hz -> update time -> 10ms
 
 typedef struct MotionParameters {
   float ta;
@@ -149,6 +149,11 @@ private:
   double prev_velocity_Millis = 0;
 
 
+  double prev_velocity = 0;
+  double m_fwd_error=0;
+  double m_previous_fwd_error =0;
+
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public:
   ///////////////////////////
@@ -168,8 +173,7 @@ public:
 
   double err = 0;
   double measured_velocity = 0;
-  double prev_velocity = 0;
-
+  
   ////////////////////////////////////////////// Setup ////////////////////////////////////////////////////////////////////
   MotorControl(byte pin1, byte pin2, byte pwm, byte channel, TwoWire &wire)
     : motorPin1(pin1),
@@ -237,20 +241,41 @@ public:
   }
 
   // PID feedback
-  double PID_Control(double target_velocity = 0, double measured_velocity = 0) {
-    err = (target_velocity - measured_velocity);
-
+  double PID_Control(double target_velocity = 0,double current_distance_change = 0) {
+    double increment = target_velocity / motor_update_freq;
+    // m_fwd_error -= current_distance_change;
+    m_fwd_error = m_fwd_error + increment - current_distance_change;
+  
+    double diff = (m_fwd_error - m_previous_fwd_error );
+    
     // Note (prev_error - err) has a large difference with changing setpoint, resulting in large Kd spikes
     // while (previos_measurement - current_measured_velocity) means it is difference on measurement, and would eliminate the Kd spike issue
-    double speed_PID_response = PID_Kp * err + PID_Ki * integral_error + PID_Kd * (previous_measurement - measured_velocity) + PID_BIAS;
+    // double speed_PID_response = PID_Kp * m_fwd_error + PID_Ki * integral_error + PID_Kd * diff + PID_BIAS;
+    double speed_PID_response = PID_Kp * m_fwd_error ;
 
-    integral_error += err;
-    prev_error = err;
-    previous_measurement = measured_velocity;  // differentiate on derivative
+      // SerialBT.print(increment);
+    // integral_error += err;
+    // prev_error = err;
+    m_previous_fwd_error = m_fwd_error;
+    // previous_measurement = current_distance_change;  // differentiate on derivative
 
-    // double pwm_PID_correction = speed_PID_response * FF_K_velocity;
     return speed_PID_response;
   }
+  // double PID_Control(double target_velocity = 0, double measured_velocity = 0) {
+  //   err = (target_velocity - measured_velocity);
+
+
+  //   // Note (prev_error - err) has a large difference with changing setpoint, resulting in large Kd spikes
+  //   // while (previos_measurement - current_measured_velocity) means it is difference on measurement, and would eliminate the Kd spike issue
+  //   double speed_PID_response = PID_Kp * err + PID_Ki * integral_error + PID_Kd * (previous_measurement - measured_velocity) + PID_BIAS;
+
+  //   integral_error += err;
+  //   prev_error = err;
+  //   previous_measurement = measured_velocity;  // differentiate on derivative
+
+  //   // double pwm_PID_correction = speed_PID_response * FF_K_velocity;
+  //   return speed_PID_response;
+  // }
 
   // Combined speed signal
   void setSpeed(double target_velocity = 0, double acceleration = 0) {
@@ -261,6 +286,7 @@ public:
       double curr_distance = angle2mm();
       ////////////////////////// distance (mm) /////////////////////////////////////
       double time_elapsed = (currentMillis - prevMillis) / 1000.0;  // Convert ms to seconds
+      double measured_distance_change = (curr_distance - prev_distance);
       measured_velocity = (curr_distance - prev_distance) / time_elapsed;     // mm/s
 
       // if (measured_velocity <= abs(10)) 
@@ -311,37 +337,24 @@ public:
       // PWM_signal += feedForward_Control(target_velocity, acceleration);
       // PWM_signal += PID_Control(target_velocity, measured_velocity);
       
-      double FF_n_PID_velocity = 0;
+      // double FF_n_PID_velocity = 0;
 
       // FF_n_PID_velocity += target_velocity;
-      FF_n_PID_velocity += PID_Control(target_velocity, measured_velocity);
+      // FF_n_PID_velocity += PID_Control(target_velocity, measured_velocity);
 
-      PWM_signal += feedForward_Control(FF_n_PID_velocity, acceleration);
-      // PWM_signal += PID_Control(target_velocity, measured_velocity);
-
-      // Serial.print(" ");
-      // Serial.print(currentMillis);
-      // Serial.print(" ");
-      // Serial.print(angle2mm());
-      // Serial.print(" ");
-      // Serial.print(angle2mm());
-      // Serial.println();
-
-      // Serial.print(" ");
-      // Serial.print(target_velocity);
-      // Serial.print(" ");
-      // Serial.print(measured_velocity);
-      // Serial.print(" ");
-      // Serial.print(feedForward_Control(target_velocity, acceleration));
-      // Serial.print(" ");
-      // Serial.print(PWM_signal);
-      // Serial.println();
+      // PWM_signal += feedForward_Control(target_velocity, acceleration);
+      // PWM_signal += PID_Control(target_velocity, measured_velocity);  // compare position, instead of velocity
+      
+      // double target_distance = abs(target_velocity*motor_update_interval) + curr_distance;
+      PWM_signal += PID_Control(target_velocity, measured_distance_change);  // compare position, instead of velocity
 
       SerialBT.print(" ");
       SerialBT.print(currentMillis);
       SerialBT.print(" ");
+      // SerialBT.print(target_distance);
       SerialBT.print(target_velocity);
       SerialBT.print(" ");
+      // SerialBT.print(curr_distance);
       SerialBT.print(measured_velocity);
       // SerialBT.print(" ");
       // SerialBT.print(PWM_signal);
@@ -359,6 +372,9 @@ public:
     integral_error = 0;
     prev_error = 0;
     previous_measurement = 0;
+    
+    m_fwd_error= angle2mm();
+    m_previous_fwd_error =0;
   }
 
   //////////////////////////////////////////////// Velocity profile //////////////////////////////////////////////////////////////////
@@ -471,6 +487,7 @@ public:
 
           // Deceleration Zone
         } else if (motionParams->time_step > motionParams->tcf) {
+          
           current_timestep_velocity = motionParams->velocity - ((motionParams->time_step / 1000) - (motionParams->tcf / 1000)) * motionParams->acceleration;
           current_timestep_acceleration = -motionParams->acceleration;
         }
@@ -514,7 +531,7 @@ MotorControl rightMotor(
 
 
 const float FWD_KM = 475.0;  // mm/s/Volt
-const float FWD_TM = 0.190;  // forward time constant
+const float FWD_TM = 0.070;  // forward time constant
 const float ROT_KM = 775.0;  // deg/s/Volt
 const float ROT_TM = 0.210;  // rotation time constant
 
@@ -522,8 +539,15 @@ const float ROT_TM = 0.210;  // rotation time constant
 const float FWD_ZETA = 0.707;
 const float FWD_TD = FWD_TM;
 
+
+  // // Feed forward portion
+  // const float SPEED_FF = (1.0 / FWD_KM);
+  // const float ACC_FF = (FWD_TM / FWD_KM);
+  // const float BIAS_FF = 0.121;
+
+
 const float FWD_KP = 16 * FWD_TM / (FWD_KM * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD);
-const float FWD_KD = LOOP_FREQUENCY * (8 * FWD_TM - FWD_TD) / (FWD_KM * FWD_TD);
+const float FWD_KD = motor_update_freq * (8 * FWD_TM - FWD_TD) / (FWD_KM * FWD_TD);
 
 
 
@@ -536,48 +560,26 @@ void motor_subsystem_setup() {
 
   rightMotor.setupEncoder(AS5600_CLOCK_WISE);  //set Clockwise rotation
   rightMotor.setupMotor(1);
-
-  double Td = 0.05;
-  // Tm = 0.03
-  // Km = 3.57
-  leftMotor.Tm = 65; //in ms
   
-  leftMotor.Tm = 715; //in ms
-  leftMotor.FF_K_offset = 307;
-  leftMotor.FF_K_velocity = 3.23;
-  leftMotor.FF_K_accel = 1168.0/ (100*leftMotor.Tm);  //max voltage over max acceleration, accel = 1/tau
-  // leftMotor.FF_K_accel = 1.79;  //max voltage over max acceleration, accel = 1/tau
-  // leftMotor.FF_K_accel = 1168.0/leftMotor.Tm;  //max voltage over max acceleration, accel = 1/tau
-  // leftMotor.FF_K_accel = 1/leftMotor.Tm;  //max voltage over max acceleration, accel = 1/tau
-  // leftMotor.FF_K_accel = 4096*leftMotor.Tm;  //max voltage over max acceleration, accel = 1/tau
+  //////////////////////////////////////////////////
+  leftMotor.FF_K_offset = 239; 
+  leftMotor.FF_K_velocity = 3.12; //mm per second per volt
+  leftMotor.FF_K_accel = (FWD_TM / leftMotor.FF_K_velocity);
 
   leftMotor.PID_BIAS = 0;
-  leftMotor.PID_Kp = 0.6*leftMotor.Tm;  // (leftMotor.Tm * 64.0) / (leftMotor.FF_K_velocity * (double)sqrt(2.0)*sqrt(2.0) * Td * Td);
-  // leftMotor.PID_Kp = KpLeft;
-  leftMotor.PID_Ki = leftMotor.Tm;
-  leftMotor.PID_Kd = 0.0;  //(8 * leftMotor.Tm - Td) / (Td * leftMotor.FF_K_velocity);
-  
-  // leftMotor.PID_BIAS = 0;
-  // leftMotor.PID_Kp = 7.80;  // (leftMotor.Tm * 64.0) / (leftMotor.FF_K_velocity * (double)sqrt(2.0)*sqrt(2.0) * Td * Td);
-  // // leftMotor.PID_Kp = KpLeft;
-  // leftMotor.PID_Ki = 0;
-  // leftMotor.PID_Kd = 0.04;  //(8 * leftMotor.Tm - Td) / (Td * leftMotor.FF_K_velocity);
+  leftMotor.PID_Kp = 16 * FWD_TM / ( leftMotor.FF_K_velocity * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD);
+  leftMotor.PID_Ki = 0;
+  leftMotor.PID_Kd = motor_update_freq * (8 * FWD_TM - FWD_TD) / ( leftMotor.FF_K_velocity * FWD_TD);
 
   //////////////////////////////////////////////////
-  // Tm = 0.03
-  // Km = 4.08
-  rightMotor.Tm = 0.035;
   rightMotor.FF_K_offset = 374;
   rightMotor.FF_K_velocity = 3.47;
-  // rightMotor.FF_K_accel = 4096*rightMotor.Tm;  //max voltage over max acceleration, accel = 1/tau
-  // rightMotor.FF_K_accel = 1/rightMotor.Tm;  //max voltage over max acceleration, accel = 1/tau
+  rightMotor.FF_K_accel = (FWD_TM / rightMotor.FF_K_velocity);
 
   rightMotor.PID_BIAS = 0;
-  rightMotor.PID_Kp = 7.8;  //(rightMotor.Tm*32.0) / (rightMotor.FF_K_velocity * (double) sqrt(2.0) * Td* Td) ;
-  // rightMotor.PID_Kp = 0;
+  rightMotor.PID_Kp = 16 * FWD_TM / (rightMotor.FF_K_velocity * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD);
   rightMotor.PID_Ki = 0;
-  // rightMotor.PID_Kd = 0;
-  rightMotor.PID_Kd = 0.04;  //(8 * rightMotor.Tm - Td ) / (Td*rightMotor.FF_K_velocity);
+  rightMotor.PID_Kd = motor_update_freq * (8 * FWD_TM - FWD_TD) / (rightMotor.FF_K_velocity * FWD_TD);
 }
 void generateStepAtPWM(int pwm) {
 

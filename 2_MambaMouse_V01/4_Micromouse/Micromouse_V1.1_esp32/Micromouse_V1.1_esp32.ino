@@ -119,6 +119,8 @@ void loop() {
     motionParams2 = rightMotor.calculateTrapezoidalProfile(2000, 800, 500);
 
     Serial.println("Start");
+    leftMotor.resetPID();
+    rightMotor.resetPID();
     while((motionParams.time_step < (motionParams.T)) && Start==1){
     // while(1){
       // Serial.print("  ");
@@ -129,7 +131,7 @@ void loop() {
       // Serial.print(motionParams.T);
       // Serial.println("  ");
       leftMotor.followProfile(&motionParams);
-      // rightMotor.followProfile(&motionParams2);
+      rightMotor.followProfile(&motionParams2);
     }
       Serial.println("End");
       Start=0;
