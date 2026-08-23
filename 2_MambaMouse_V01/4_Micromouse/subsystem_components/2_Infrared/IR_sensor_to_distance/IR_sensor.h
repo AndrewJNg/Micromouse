@@ -52,7 +52,8 @@ class IR_sensor {
       int y = average;
       // double reading = a / (y - b);
 
-      double reading = a/log10(y) - b;
+      // double reading = a/log10(y) - b;
+      double reading = y;
       //reading = 1/reading;
       //      double output = 36.8701/(1.0312e3*((1/y)-(1/1.0312e3)));
       // return y ;

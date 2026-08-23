@@ -3,7 +3,7 @@ import csv
 
 ser = serial.Serial("COM6", 115200)
 
-filename = "serial_data.csv"
+filename = "serial_data2.csv"
 
 try:
     with open(filename, "w", newline="") as csvfile:
@@ -29,4 +29,4 @@ except KeyboardInterrupt:
 
 finally:
     ser.close()
-    print(f"CSV file saved as: {filename}")
+    print(f"CSV file saved as: {filename}") 
