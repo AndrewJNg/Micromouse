@@ -1,5 +1,4 @@
 ///////////////////////////////////////////////////////////////////////
-// #include <AS5600.h>  // https://github.com/RobTillaart/AS5600
 #include "MT6701.h"
 #include <cmath>
 
@@ -72,6 +71,7 @@ private:
 
   double prev_velocity = 0;
   double m_previous_fwd_error = 0;
+  double prev_FF_velocity =0;
 
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,11 +160,6 @@ public:
     return cumulativeAngle;
   }
 
-
-
-  // double angle2mm() {
-  //   return (2 * M_PI * wheelRadius * (double)updateEncoder()) / encoder_tick_per_rev;
-  // }
   double angle2mm() {
     return (2.0 * M_PI * wheelRadius * updateEncoder()) / 360.0;
   }
@@ -192,15 +187,16 @@ public:
 
   /////////////////////// Motor RPM control //////////////////
   // Feedforward - https://youtu.be/qKoPRacXk9Q?si=ahXkdiADK6ndN237
-  int feedForward_Control(double velocity, double acceleration) {
-    // bool FF_dir = (direction == 1 || direction == -1) ? direction : 1;  // Ensure drive_dir is either 1 or -1
+  // int feedForward_Control(double velocity, double acceleration) {
+  int feedForward_Control(double velocity) {
+    double acceleration = (velocity - prev_FF_velocity)*motor_update_interval/1000;
     int pwm_FF = FF_K_offset + FF_K_velocity * velocity + FF_K_accel * acceleration;
     return pwm_FF;
   }
 
   // PID feedback
   int PID_Control(double target_velocity = 0, double current_distance_change = 0) {
-    double increment = target_velocity / motor_update_freq;
+    double increment = target_velocity *motor_update_interval/1000;
     // double increment = 0 ;
     m_fwd_error += increment - current_distance_change;
 
@@ -213,7 +209,7 @@ public:
   }
 
   // Combined speed signal
-  void setSpeed(double target_velocity = 0, double acceleration = 0) {
+  void setSpeed(double target_velocity = 0) {
     // obtain speed from encoder
 
     unsigned long currentMillis = millis();
@@ -230,19 +226,19 @@ public:
 
       // Apply feedforward and PID signal
       int PWM_signal = 0;
-      // PWM_signal += feedForward_Control(target_velocity, acceleration);
+      // PWM_signal += feedForward_Control(target_velocity);
       PWM_signal += PID_Control(target_velocity, measured_distance_change);
 
       // // Print out debug velocities
-      // SerialBT.print(" ");
-      // SerialBT.print(currentMillis);
-      // SerialBT.print(" ");
-      // SerialBT.print(target_velocity);
-      // SerialBT.print(" ");
-      // SerialBT.print(measured_velocity);
-      // SerialBT.print(" ");
-      // SerialBT.print(PWM_signal);
-      // SerialBT.println();
+      SerialBT.print(" ");
+      SerialBT.print(currentMillis);
+      SerialBT.print(" ");
+      SerialBT.print(target_velocity);
+      SerialBT.print(" ");
+      SerialBT.print(measured_velocity);
+      SerialBT.print(" ");
+      SerialBT.print(PWM_signal);
+      SerialBT.println();
 
 
 
@@ -381,7 +377,7 @@ public:
         // Serial.print("  ");
         // Serial.print(current_timestep_acceleration);
         // Serial.println("  ");
-        setSpeed(current_timestep_velocity, current_timestep_acceleration);
+        setSpeed(current_timestep_velocity);
 
       } else {
         // To reach here we have passed the full duration of the feed forward action, we can stop the motor now.
@@ -410,11 +406,11 @@ MotorControl rightMotor(
 );
 
 
-const float FWD_KM = 475.0;  // mm/s/Volt
-const float FWD_TM = 0.020;  // forward time constant
+const float FWD_KM = 260;  // mm/s/V
+const float FWD_TM = 0.020;  // forward time constant (in seconds)
 // const float FWD_TM = 0.07;  // forward time constant
-const float ROT_KM = 775.0;  // deg/s/Volt
-const float ROT_TM = 0.210;  // rotation time constant
+// const float ROT_KM = 775.0;  // deg/s/Volt
+// const float ROT_TM = 0.210;  // rotation time constant
 
 // forward motion controller constants
 // const float FWD_ZETA = 1.0;
@@ -480,16 +476,21 @@ void motor_subsystem_setup() {
   //////////////////////////////////////////////////
   leftMotor.FF_K_offset = 380;
   leftMotor.FF_K_velocity = 3.72;
-  leftMotor.FF_K_accel = (FWD_TM / leftMotor.FF_K_velocity);
+  leftMotor.FF_K_accel = (FWD_TM / leftMotor.FF_K_velocity );
 
-  leftMotor.PID_Kp = 16 * FWD_TM / (leftMotor.FF_K_velocity * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD);
-  leftMotor.PID_Kd = motor_update_freq * (8 * FWD_TM - FWD_TD) / (leftMotor.FF_K_velocity * FWD_TD);
+  leftMotor.PID_Kp = 16 * FWD_TM / (FWD_KM  * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD);
+
+  // leftMotor.PID_Kp = FWD_TM / (FWD_KM  * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD);
+  // leftMotor.PID_Kp = 32 / (FWD_KM *FWD_TM);
+  // Serial.print("leftMotor.PID_Kp  ");
+  // Serial.println(leftMotor.PID_Kp);
+  // leftMotor.PID_Kd = motor_update_freq * (8 * FWD_TM - FWD_TD) / (FWD_KM  * FWD_TD);
 
   //////////////////////////////////////////////////
   rightMotor.FF_K_offset = 380;
   rightMotor.FF_K_velocity = 3.72;
-  rightMotor.FF_K_accel = (FWD_TM / rightMotor.FF_K_velocity);
+  rightMotor.FF_K_accel = (FWD_TM / rightMotor.FF_K_velocity );
 
-  rightMotor.PID_Kp = 16 * FWD_TM / (rightMotor.FF_K_velocity * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD);
-  rightMotor.PID_Kd = motor_update_freq * (8 * FWD_TM - FWD_TD) / (rightMotor.FF_K_velocity * FWD_TD);
+  // rightMotor.PID_Kp = 16 * FWD_TM / (FWD_KM  * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD);
+  // rightMotor.PID_Kd = motor_update_freq * (8 * FWD_TM - FWD_TD) / (FWD_KM  * FWD_TD);
 }

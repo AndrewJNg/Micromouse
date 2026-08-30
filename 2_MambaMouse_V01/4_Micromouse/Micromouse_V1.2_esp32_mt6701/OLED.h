@@ -142,8 +142,8 @@ void OLED_menu_display()
     OLED.setTextColor(SSD1306_WHITE);
     OLED.setCursor(106, 7);
     OLED.cp437(true);
-    OLED.print(int(voltage_level()));
-    OLED.print("%");
+    OLED.print(voltage_level(),1);
+    // OLED.print("%");
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -386,7 +386,7 @@ void OLED_display_stats()
 //    OLED.println(micros() - timeRecord);
     
     OLED.print("P: ");
-    OLED.println(KpLeft,5);
+    OLED.println(leftMotor.PID_Kp,5);
     OLED.print("I: ");
     OLED.println(KiLeft,5);
     OLED.print("D: ");
