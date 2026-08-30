@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
-#include <AS5600.h>  // https://github.com/RobTillaart/AS5600
+// #include <AS5600.h>  // https://github.com/RobTillaart/AS5600
+#include "MT6701.h"
 #include <cmath>
 
 // Encoder parameters
@@ -43,7 +44,13 @@ typedef struct MotionParameters {
 class MotorControl {
 private:
   // Classes used
-  AS5600 encoder;
+  MT6701 encoder;
+
+  // Variables for multi-turn position tracking
+  double previousAngle = 0;
+  double cumulativeAngle = 0;
+  bool encoderInitialized = false;
+  int encoder_dir = 1;
 
   // Motor properties
   byte motorPin1;
@@ -64,13 +71,13 @@ private:
 
 
   double prev_velocity = 0;
-  double m_fwd_error = 0;
   double m_previous_fwd_error = 0;
 
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public:
   ///////////////////////////
+  double m_fwd_error = 0;
   double Tm = 0;
 
   // Feedforward constants
@@ -92,12 +99,21 @@ public:
   MotorControl(byte pin1, byte pin2, byte pwm, TwoWire &wire)
     : motorPin1(pin1),
       motorPin2(pin2),
-      motorPWM(pwm),
-      encoder(&wire) {}
+      motorPWM(pwm) {
+    encoder.initializeI2C(&wire);
+  }
 
+  // void setupEncoder(bool clockwise) {
+  //   encoder.begin();
+  // encoder.setDirection(clockwise ? AS5600_COUNTERCLOCK_WISE : AS5600_CLOCK_WISE);
+  // }
   void setupEncoder(bool clockwise) {
-    encoder.begin();
-    encoder.setDirection(clockwise ? AS5600_COUNTERCLOCK_WISE : AS5600_CLOCK_WISE);
+    encoder_dir = clockwise ? 1 : -1;
+    double angle = encoder.angleRead();
+    previousAngle = angle;
+    cumulativeAngle = 0;
+
+    encoderInitialized = true;
   }
 
   void setupMotor(int direction = 1) {
@@ -107,26 +123,57 @@ public:
 
     stopMotor();
     drive_dir = (direction == 1 || direction == -1) ? direction : 1;  // Ensure drive_dir is either 1 or -1
-    motor_update_interval = 1000 / motor_update_freq;                 //in ms
+    motor_update_interval = 1000.0 / motor_update_freq;               //in ms
     PID_Kd = PID_Kd * motor_update_freq;
   }
   //////////////////////////////////////////////// Encoder feedback //////////////////////////////////////////////////////////////////
   // Encoder distance
+  // double updateEncoder() {
+  //   /////////////////// Library cummulative calculation ///////////////
+  //   double currAngle = encoder.getCumulativePosition(1);
+  //   return currAngle;
+  // }
   double updateEncoder() {
-    /////////////////// Library cummulative calculation ///////////////
-    double currAngle = encoder.getCumulativePosition(1);
-    return currAngle;
+    double currentAngle = encoder.angleRead();
+
+    if (!encoderInitialized) {
+      previousAngle = currentAngle;
+      encoderInitialized = true;
+      return cumulativeAngle;
+    }
+
+    // Calculate change in angle
+    double deltaAngle = currentAngle - previousAngle;
+
+    // Handle wrap-around
+    if (deltaAngle > 180.0) {
+      deltaAngle -= 360.0;
+    } else if (deltaAngle < -180.0) {
+      deltaAngle += 360.0;
+    }
+
+    // Apply encoder direction
+    cumulativeAngle += deltaAngle * encoder_dir;
+
+    previousAngle = currentAngle;
+
+    return cumulativeAngle;
   }
 
+
+
+  // double angle2mm() {
+  //   return (2 * M_PI * wheelRadius * (double)updateEncoder()) / encoder_tick_per_rev;
+  // }
   double angle2mm() {
-    return (2 * M_PI * wheelRadius * (double)updateEncoder()) / encoder_tick_per_rev;
+    return (2.0 * M_PI * wheelRadius * updateEncoder()) / 360.0;
   }
 
   //////////////////////////////////////////////// Motor control //////////////////////////////////////////////////////////////////
   // Write PWM speed to motor
   void setMotorPWM(int speed) {
     speed = constrain(speed * drive_dir, -PWMResolutionMaxValue, PWMResolutionMaxValue);
-     
+
     if (speed > 0) {
       digitalWrite(motorPin1, LOW);
       digitalWrite(motorPin2, HIGH);
@@ -146,6 +193,7 @@ public:
   /////////////////////// Motor RPM control //////////////////
   // Feedforward - https://youtu.be/qKoPRacXk9Q?si=ahXkdiADK6ndN237
   int feedForward_Control(double velocity, double acceleration) {
+    // bool FF_dir = (direction == 1 || direction == -1) ? direction : 1;  // Ensure drive_dir is either 1 or -1
     int pwm_FF = FF_K_offset + FF_K_velocity * velocity + FF_K_accel * acceleration;
     return pwm_FF;
   }
@@ -153,12 +201,14 @@ public:
   // PID feedback
   int PID_Control(double target_velocity = 0, double current_distance_change = 0) {
     double increment = target_velocity / motor_update_freq;
+    // double increment = 0 ;
     m_fwd_error += increment - current_distance_change;
 
     double diff = (m_fwd_error - m_previous_fwd_error);
     m_previous_fwd_error = m_fwd_error;
 
     int speed_PID_response = PID_Kp * m_fwd_error + PID_Kd * diff;
+
     return speed_PID_response;
   }
 
@@ -180,19 +230,19 @@ public:
 
       // Apply feedforward and PID signal
       int PWM_signal = 0;
-      PWM_signal += feedForward_Control(target_velocity, acceleration);
+      // PWM_signal += feedForward_Control(target_velocity, acceleration);
       PWM_signal += PID_Control(target_velocity, measured_distance_change);
 
-      // Print out debug velocities
-      SerialBT.print(" ");
-      SerialBT.print(currentMillis);
-      SerialBT.print(" ");
-      SerialBT.print(target_velocity);
-      SerialBT.print(" ");
-      SerialBT.print(measured_velocity);
-      SerialBT.print(" ");
-      SerialBT.print(PWM_signal);
-      SerialBT.println();
+      // // Print out debug velocities
+      // SerialBT.print(" ");
+      // SerialBT.print(currentMillis);
+      // SerialBT.print(" ");
+      // SerialBT.print(target_velocity);
+      // SerialBT.print(" ");
+      // SerialBT.print(measured_velocity);
+      // SerialBT.print(" ");
+      // SerialBT.print(PWM_signal);
+      // SerialBT.println();
 
 
 
@@ -361,13 +411,15 @@ MotorControl rightMotor(
 
 
 const float FWD_KM = 475.0;  // mm/s/Volt
-const float FWD_TM = 0.070;  // forward time constant
+const float FWD_TM = 0.020;  // forward time constant
+// const float FWD_TM = 0.07;  // forward time constant
 const float ROT_KM = 775.0;  // deg/s/Volt
 const float ROT_TM = 0.210;  // rotation time constant
 
 // forward motion controller constants
+// const float FWD_ZETA = 1.0;
 const float FWD_ZETA = 0.707;
-const float FWD_TD = FWD_TM ;
+const float FWD_TD = FWD_TM;
 
 
 
@@ -383,7 +435,7 @@ void generateStepAtPWM(int pwm) {
   unsigned long currentMillis = millis();
   do {
     currentMillis = millis();
-    if ((currentMillis - prevMillis) >= 10) {
+    if ((currentMillis - prevMillis) >= 5) {
       SerialBT.print(" ");
       SerialBT.print(currentMillis);
       SerialBT.print(" ");
@@ -419,23 +471,23 @@ void motor_subsystem_setup() {
   Wire.begin(SDA_1, SCL_1, i2c_speed);
   Wire1.begin(SDA_2, SCL_2, i2c_speed);
 
-  leftMotor.setupEncoder(AS5600_COUNTERCLOCK_WISE);  //set Counter_clockwise rotation
+  leftMotor.setupEncoder(1);  //set Counter_clockwise rotation
   leftMotor.setupMotor(1);
 
-  rightMotor.setupEncoder(AS5600_CLOCK_WISE);  //set Clockwise rotation
+  rightMotor.setupEncoder(0);  //set Clockwise rotation
   rightMotor.setupMotor(1);
 
   //////////////////////////////////////////////////
-  leftMotor.FF_K_offset = 239;
-  leftMotor.FF_K_velocity = 3.12;
+  leftMotor.FF_K_offset = 380;
+  leftMotor.FF_K_velocity = 3.72;
   leftMotor.FF_K_accel = (FWD_TM / leftMotor.FF_K_velocity);
 
   leftMotor.PID_Kp = 16 * FWD_TM / (leftMotor.FF_K_velocity * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD);
   leftMotor.PID_Kd = motor_update_freq * (8 * FWD_TM - FWD_TD) / (leftMotor.FF_K_velocity * FWD_TD);
 
   //////////////////////////////////////////////////
-  rightMotor.FF_K_offset = 374;
-  rightMotor.FF_K_velocity = 3.47;
+  rightMotor.FF_K_offset = 380;
+  rightMotor.FF_K_velocity = 3.72;
   rightMotor.FF_K_accel = (FWD_TM / rightMotor.FF_K_velocity);
 
   rightMotor.PID_Kp = 16 * FWD_TM / (rightMotor.FF_K_velocity * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD);

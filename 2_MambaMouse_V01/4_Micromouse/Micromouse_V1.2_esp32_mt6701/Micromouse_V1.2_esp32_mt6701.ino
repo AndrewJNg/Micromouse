@@ -18,7 +18,7 @@ void setup();
 void loop();
 void system();
 
-int Mode = 1;  // set mode 1 as default
+int Mode = 3;  // set mode 1 as default
 int Start = false;
 
 unsigned long StartTimer = 0;
@@ -86,8 +86,8 @@ void loop() {
       rightMotor.resetPID();
       while (true) {
         system();
-        leftMotor.setSpeed(500);
-        rightMotor.setSpeed(500);
+        leftMotor.setSpeed(800);
+        // rightMotor.setSpeed(800);
         OLED_display_stats();
       }
 
@@ -120,6 +120,7 @@ void loop() {
       leftMotor.resetPID();
       rightMotor.resetPID();
       while ((motionParams.time_step < (motionParams.T)) && Start == 1) {
+        
         // while(1){
         // Serial.print("  ");
         // Serial.print(motionParams.prev_time);
@@ -130,6 +131,8 @@ void loop() {
         // Serial.println("  ");
         leftMotor.followProfile(&motionParams);
         // rightMotor.followProfile(&motionParams2);
+        system();
+        OLED_display_stats();
       }
       Serial.println("End");
       Start = 0;
