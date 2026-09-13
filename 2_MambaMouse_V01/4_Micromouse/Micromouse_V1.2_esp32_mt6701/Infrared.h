@@ -6,8 +6,16 @@ const byte IRRecPin[6] = { 36, 39, 32, 33, 34, 35 };
 int minIR[6] = { 4095, 4095, 4095, 4095, 4095, 4095 };
 int maxIR[6] = { 0, 0, 0, 0, 0, 0 };
 double IRVal[6] = { 0, 0, 0, 0, 0, 0 };
+double IRDistance[6] = { 0, 0, 0, 0, 0, 0 };
+
+double IR_ref_value[6] = { 819, 1269, 1000, 1000, 1064, 1187 };
+
 
 unsigned long IR_prevMillis = 0;
+
+const int left_Wall_cal = 895;
+const int right_Wall_cal = 1341;
+
 
 // function prototypes
 void IR_setup();
@@ -38,7 +46,9 @@ void IR_update() {
       // Serial.print(analogRead(IRRecPin[x]));
 
       // IRVal[x] = map(analogRead(IRRecPin[x]), minIR[x], maxIR[x], 0, 10000)/100;
-      IRVal[x] = map(analogRead(IRRecPin[x]), 0, 4095, 0, 10000)/100;
+      int val = analogRead(IRRecPin[x]);
+      IRVal[x] = map(val, 0, 4095, 0, 10000)/100;
+      IRDistance[x] = 100*log(IR_ref_value[x])/log(val);
       digitalWrite(IREmitPin[x], LOW);
       
       // Serial.print(" ");

@@ -5,15 +5,14 @@
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
-#define OLED_RESET     4
+#define OLED_RESET 15
 Adafruit_SSD1306 OLED(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 unsigned long OledMillis = 0;
 int OledInterval = 100;
-static const unsigned char PROGMEM iQuick_logo[] =
-{ //iQuick Logo
+static const unsigned char PROGMEM iQuick_logo[] = {  //iQuick Logo
 
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -81,8 +80,7 @@ static const unsigned char PROGMEM iQuick_logo[] =
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static const unsigned char PROGMEM battery_logo[] =
-{ //Battery Logo
+static const unsigned char PROGMEM battery_logo[] = {  //Battery Logo
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x3f, 0xff, 0xfc, 0x00, 0x7f, 0xff, 0xfe, 0x00, 0xc0, 0x00, 0x06, 0x00, 0xc0, 0x00, 0x07, 0x80,
   0xc0, 0x00, 0x07, 0x80, 0xc0, 0x00, 0x07, 0x80, 0xc0, 0x00, 0x07, 0x80, 0xc0, 0x00, 0x07, 0x80,
@@ -90,8 +88,7 @@ static const unsigned char PROGMEM battery_logo[] =
   0x3f, 0xff, 0xfc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static const unsigned char PROGMEM Calibrate_Logo[] =
-{ // 'Calibrate', 106x30px
+static const unsigned char PROGMEM Calibrate_Logo[] = {  // 'Calibrate', 106x30px
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -124,13 +121,11 @@ static const unsigned char PROGMEM Calibrate_Logo[] =
 
 unsigned int getPosition = 0;
 unsigned long OLED_prevMillis = 0;
-void OLED_menu_display()
-{
+void OLED_menu_display() {
 
 
 
-  if ((millis() > 3000) && (Start == LOW))
-  {
+  if ((millis() > 3000) && (Start == LOW)) {
     OLED.clearDisplay();
 
 
@@ -142,12 +137,12 @@ void OLED_menu_display()
     OLED.setTextColor(SSD1306_WHITE);
     OLED.setCursor(106, 7);
     OLED.cp437(true);
-    OLED.print(voltage_level(),1);
+    OLED.print(voltage_level(), 1);
     // OLED.print("%");
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
-    OLED.fillRect(0, 0 , 20, 64, SSD1306_BLACK);
+    OLED.fillRect(0, 0, 20, 64, SSD1306_BLACK);
 
     OLED.drawRect(0, 0, 20, 16, SSD1306_WHITE);
     OLED.setTextSize(1);
@@ -170,66 +165,57 @@ void OLED_menu_display()
     OLED.cp437(true);
     OLED.write("2");
 
-    OLED.drawRect(0, 47 , 20, 16, SSD1306_WHITE);
+    OLED.drawRect(0, 47, 20, 16, SSD1306_WHITE);
     OLED.setTextSize(1);
     OLED.setTextColor(SSD1306_WHITE);
     OLED.setCursor(7, 51);
     OLED.cp437(true);
     OLED.write("1");
 
-    for (int x = 1; x < 5; x++)
-    {
+    for (int x = 1; x < 5; x++) {
       int y = 64 - (x * 16);
-      if (Mode == x)
-      {
-        OLED.fillRect(0, y , 20, 16, SSD1306_WHITE);
+      if (Mode == x) {
+        OLED.fillRect(0, y, 20, 16, SSD1306_WHITE);
         OLED.setTextSize(1);
         OLED.setTextColor(SSD1306_BLACK);
         //        OLED.setCursor(7, y - 12);
         OLED.setCursor(7, y + 4);
         OLED.cp437(true);
-        OLED.write(x + 48); // convert to ASCII number
+        OLED.write(x + 48);  // convert to ASCII number
       }
     }
 
     OLED.setTextColor(SSD1306_WHITE);
     OLED.cp437(true);
-    if (Mode == 1)
-    {
-      
+    if (Mode == 1) {
+
       OLED.setTextSize(1);
       OLED.setCursor(25, 20);
       OLED.println("Vel   = 1");
       OLED.setCursor(25, 30);
       OLED.println("Accel = 1");
 
-      
+
       OLED.setTextSize(2);
       OLED.setCursor(25, 50);
       OLED.print("Search");
-    }
-    else if (Mode == 2)
-    {
+    } else if (Mode == 2) {
 
       OLED.setTextSize(1);
       OLED.setCursor(25, 20);
       OLED.println("Vel   = 1");
       OLED.setCursor(25, 30);
       OLED.println("Accel = 1");
-      
+
       OLED.setTextSize(2);
       OLED.setCursor(25, 50);
       OLED.println("Speed");
-    }
-    else if (Mode == 3)
-    {
+    } else if (Mode == 3) {
       // OLED.drawBitmap(22, 35, Calibrate_Logo, 106, 30, 1);
       OLED.setTextSize(2);
       OLED.setCursor(25, 50);
       OLED.println("Calibr");
-    }
-    else if (Mode == 4)
-    {
+    } else if (Mode == 4) {
       OLED.setTextSize(2);
       OLED.setCursor(25, 30);
       OLED.println("PS3");
@@ -237,41 +223,33 @@ void OLED_menu_display()
       OLED.print("controls");
     }
   }
-  OLED.display(); //update the display
+  OLED.display();  //update the display
 }
 
 
-void OledTimer()
-{
-  if (millis() - OledMillis >= OledInterval)
-  {
-    if ((Start == HIGH) && Mode != 4)
-    {
-      unsigned long RaceTime =  millis() - StartTimer ;
+void OledTimer() {
+  if (millis() - OledMillis >= OledInterval) {
+    if ((Start == HIGH) && Mode != 4) {
+      unsigned long RaceTime = millis() - StartTimer;
       unsigned long minutes = RaceTime / 60000;
       RaceTime -= minutes * 60000;
       unsigned long seconds = RaceTime / 1000;
       RaceTime -= seconds * 1000;
       unsigned long milliseconds = RaceTime;
       OLED.clearDisplay();
-      if (minutes >= 100)
-      {
+      if (minutes >= 100) {
         OLED.setTextSize(3);
         OLED.setTextColor(SSD1306_WHITE);
         OLED.setCursor(0, 0);
         OLED.cp437(true);
         OLED.print(minutes);
-      }
-      else  if (minutes >= 10)
-      {
+      } else if (minutes >= 10) {
         OLED.setTextSize(4);
         OLED.setTextColor(SSD1306_WHITE);
         OLED.setCursor(0, 0);
         OLED.cp437(true);
         OLED.print(minutes);
-      }
-      else
-      {
+      } else {
         OLED.setTextSize(4);
         OLED.setTextColor(SSD1306_WHITE);
         OLED.setCursor(23, 0);
@@ -282,40 +260,30 @@ void OledTimer()
 
 
 
-      if (seconds >= 10)
-      {
+      if (seconds >= 10) {
         OLED.print(":");
         OLED.println(seconds);
-      }
-      else
-      {
+      } else {
         OLED.print(":0");
         OLED.println(seconds);
       }
 
-      if (milliseconds >= 100)
-      {
+      if (milliseconds >= 100) {
         OLED.setTextSize(3);
         OLED.setCursor(50, 40);
         OLED.print(":");
         OLED.print(milliseconds);
-      }
-      else if (milliseconds >= 10)
-      {
+      } else if (milliseconds >= 10) {
         OLED.setTextSize(3);
         OLED.setCursor(50, 40);
         OLED.print(":0");
         OLED.print(milliseconds);
-      }
-      else if (milliseconds >= 1)
-      {
+      } else if (milliseconds >= 1) {
         OLED.setTextSize(3);
         OLED.setCursor(50, 40);
         OLED.print(":00");
         OLED.print(milliseconds);
-      }
-      else
-      {
+      } else {
         OLED.setTextSize(3);
         OLED.setCursor(50, 40);
         OLED.print(":000");
@@ -325,7 +293,7 @@ void OledTimer()
 
 
 
-      OLED.display(); //update the display
+      OLED.display();  //update the display
     }
     OledMillis = millis();
   }
@@ -333,8 +301,7 @@ void OledTimer()
 
 
 
-void OLED_display_stats()
-{
+void OLED_display_stats() {
   static unsigned long prevMillis = 0;
   unsigned long currentMillis = millis();
 
@@ -345,9 +312,9 @@ void OLED_display_stats()
 
     OLED.clearDisplay();
 
-    OLED.setTextSize(1);      // Normal 1:1 pixel scale
-    OLED.setTextColor(SSD1306_WHITE); // Draw white text
-    OLED.setCursor(0, 0);     // Start at top-left corner
+    OLED.setTextSize(1);               // Normal 1:1 pixel scale
+    OLED.setTextColor(SSD1306_WHITE);  // Draw white text
+    OLED.setCursor(0, 0);              // Start at top-left corner
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // motor & encoder
@@ -355,70 +322,86 @@ void OLED_display_stats()
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // IR
     OLED.print("IRFront:  ");
-    OLED.print(IRVal[0],0);
+    OLED.print(map(IRVal[0] * 100, 0, 10000, 0, 4095), 0);
     OLED.print("  ");
-    OLED.println(IRVal[5],0);
+    OLED.println(map(IRVal[5] * 100, 0, 10000, 0, 4095), 0);
 
     OLED.print("IR45:     ");
-    OLED.print(IRVal[1],0 );
+    OLED.print(map(IRVal[1] * 100, 0, 10000, 0, 4095), 0);
     OLED.print("  ");
-    OLED.println(IRVal[4],0 );
+    OLED.println(map(IRVal[4] * 100, 0, 10000, 0, 4095), 0);
 
-    OLED.print("IRSide:   ");
-    OLED.print(IRVal[2],0);
-    OLED.print("  ");
-    OLED.println(IRVal[3],0);
+    // OLED.print("IRSide:   ");
+    // OLED.print(map(IRVal[2] * 100, 0, 10000, 0, 4095), 0);
+    // OLED.print("  ");
+    // OLED.println(map(IRVal[3] * 100, 0, 10000, 0, 4095), 0);
     
+    OLED.print("IRFront:  ");
+    OLED.print(IRDistance[0], 0);
+    OLED.print("  ");
+    OLED.println(IRDistance[5],0);
+
+    OLED.print("IR45:     ");
+    OLED.print(IRDistance[1],0);
+    OLED.print("  ");
+    OLED.println(IRDistance[4],0);
+
+    // OLED.print("IRSide:   ");
+    // OLED.print(IRDistance[2],0);
+    // OLED.print("  ");
+    // OLED.println(IRDistance[3],0);
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Gyro
     //    OLED.println("Gyro    ");
-//    OLED.println("  ");
-//    OLED.print("X:");
-//    OLED.print( gyroX, 1);
-//    OLED.print(" Y:");
-//    OLED.print( gyroY, 1);
-//    OLED.print(" Z:");
-//    //    OLED.println( gyroZ, 1);
-//    OLED.println( MPU_Z_angle(), 1);
+    //    OLED.println("  ");
+    //    OLED.print("X:");
+    //    OLED.print( gyroX, 1);
+    //    OLED.print(" Y:");
+    //    OLED.print( gyroY, 1);
+    //    OLED.print(" Z:");
+    //    //    OLED.println( gyroZ, 1);
+    //    OLED.println( MPU_Z_angle(), 1);
 
-//    OLED.print("OLED: ");
-//    OLED.println(micros() - timeRecord);
-    
-    OLED.print("P: ");
-    OLED.println(leftMotor.PID_Kp,5);
-    OLED.print("I: ");
-    OLED.println(KiLeft,5);
-    OLED.print("D: ");
-    OLED.println(KdLeft,5);
+    //    OLED.print("OLED: ");
+    //    OLED.println(micros() - timeRecord);
 
-    
-    OLED.print("Gyro: ");
-    OLED.println(gyroZ,2);
-    
+    // OLED.print("P: ");
+    // OLED.println(leftMotor.PID_Kp, 5);
+    // OLED.print("I: ");
+    // OLED.println(KiLeft, 5);
+    // OLED.print("D: ");
+    // OLED.println(KdLeft, 5);
 
-    // OLED.print("L: ");  
+
+    // OLED.print("Gyro: ");
+    // OLED.println(gyroZ, 2);
+
+
+    // OLED.print("L: ");
     // OLED.print(leftMotor.angle2mm());
-    // OLED.print(" R: ");  
+    // OLED.print(" R: ");
     // OLED.println(rightMotor.angle2mm());
 
-  
 
-    // OLED.print("L: ");  
+
+    // OLED.print("L: ");
     // OLED.print(leftMotor.updateEncoder());
-    // OLED.print(" R: ");  
+    // OLED.print(" R: ");
     // OLED.println(rightMotor.updateEncoder());
-            
-    OLED.print("L: ");  
-    OLED.print(leftMotor.measured_velocity);
-    OLED.print(" R: ");  
-    OLED.println(rightMotor.measured_velocity);
-    
-    // OLED.print("L: ");  
-    // OLED.print(leftMotor.err);
-    // OLED.print(" R: ");  
-    // OLED.println(rightMotor.err);
-    
+
+    // OLED.print("L: ");
+    // OLED.print(leftMotor.measured_velocity);
+    // OLED.print(" R: ");
+    // OLED.println(rightMotor.measured_velocity);
+
+
+    OLED.print("L: ");
+    OLED.print(leftMotor.angle2mm());
+    OLED.print(" R: ");
+    OLED.println(rightMotor.angle2mm());
+
     /*
      
     OLED.print("P: ");
@@ -428,17 +411,17 @@ void OLED_display_stats()
     OLED.print("D: ");
     OLED.println(straightKd,5);
      */
-//    OLED.print("P: ");
-//    OLED.println(Kp);
-//    OLED.print("I: ");
-//    OLED.println(Ki);
-//    OLED.print("D: ");
-//    OLED.println(Kd);
+    //    OLED.print("P: ");
+    //    OLED.println(Kp);
+    //    OLED.print("I: ");
+    //    OLED.println(Ki);
+    //    OLED.print("D: ");
+    //    OLED.println(Kd);
 
-//    OLED.print(" Set: ");
-//    OLED.println( Setpoint);
-//    OLED.print(" Z: ");
-//    OLED.println( MPU_Z_angle(), 1);
+    //    OLED.print(" Set: ");
+    //    OLED.println( Setpoint);
+    //    OLED.print(" Z: ");
+    //    OLED.println( MPU_Z_angle(), 1);
 
 
     OLED.display();
@@ -446,23 +429,35 @@ void OLED_display_stats()
 }
 
 
-void OLED_setup()
-{
+void OLED_setup() {
+
   // User_interface setup
-  if (!OLED.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x64
-    //    Serial.println(F("SSD1306 allocation failed"));
-    for (;;); // Don't proceed, loop forever
+  if (!OLED.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {  // Address 0x3C for 128x64
+    Serial.println(F("SSD1306 allocation failed"));
+    for (;;)
+      ;  // Don't proceed, loop forever
   }
+  //   if (!OLED.begin(
+  //     SSD1306_SWITCHCAPVCC,
+  //     0x3C,
+  //     true,   // reset
+  //     false   // DON'T call Wire.begin() internally
+  // )) {
+
+  //     Serial.println("SSD1306 allocation failed");
+
+  //     for (;;);
+  // }
   OLED.clearDisplay();
   OLED.display();
 
   //show logo
   OLED.clearDisplay();
-  OLED.drawBitmap(  (OLED.width()  - 128 ) / 2, (OLED.height() - 64) / 2, iQuick_logo, 128, 64, 1);
-  OLED.setTextSize(1);      // Normal 1:1 pixel scale
-  OLED.setTextColor(SSD1306_WHITE); // Draw white text
+  OLED.drawBitmap((OLED.width() - 128) / 2, (OLED.height() - 64) / 2, iQuick_logo, 128, 64, 1);
+  OLED.setTextSize(1);               // Normal 1:1 pixel scale
+  OLED.setTextColor(SSD1306_WHITE);  // Draw white text
   OLED.setCursor(45, 50);
-  OLED.cp437(true);         // Use full 256 char 'Code Page 437' font
+  OLED.cp437(true);  // Use full 256 char 'Code Page 437' font
   OLED.print("iQuick");
   OLED.display();
 }

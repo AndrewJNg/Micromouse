@@ -18,7 +18,7 @@ void setup();
 void loop();
 void system();
 
-int Mode = 3;  // set mode 1 as default
+int Mode = 1;  // set mode 1 as default
 int Start = false;
 
 unsigned long StartTimer = 0;
@@ -65,8 +65,6 @@ void setup() {
 #if PS3_enable
   PS3_setup();
 #endif
-
-
   // FloodFill_setup();
 }
 
@@ -84,16 +82,52 @@ void loop() {
 
       leftMotor.resetPID();
       rightMotor.resetPID();
+      leftMotor.current_batt_voltage = voltage_level();
+      rightMotor.current_batt_voltage = voltage_level();
+
+      static double target_pos = 0;
+      static unsigned long previousTargetChange = 0;
+      double curr_distance_left = 0;
+      double curr_distance_right = 0;
+
       while (true) {
         system();
-        leftMotor.setSpeed(800);
+        // leftMotor.setSpeed(600);
         // rightMotor.setSpeed(800);
         OLED_display_stats();
+        // leftMotor.setMotorVolt(4);
+
+        curr_distance_left = leftMotor.angle2mm();
+        curr_distance_right = rightMotor.angle2mm();
+
+        // Timer variables
+
+        // Check if 5 seconds have passed
+        if (millis() - previousTargetChange >= 5000) {
+
+          previousTargetChange = millis();
+
+          // Toggle between 0 mm and 1000 mm
+          if (target_pos == 0) {
+            target_pos = 150;
+          } else {
+            target_pos = 0;
+          }
+        }
+        // Run position control
+        double Volt_signal_left = leftMotor.PID_Control(target_pos, curr_distance_left);
+        leftMotor.setMotorVolt(Volt_signal_left);
+
+        double Volt_signal_right = rightMotor.PID_Control(target_pos, curr_distance_right);
+        rightMotor.setMotorVolt(Volt_signal_right);
       }
 
 
 
+
     } else if (Mode == 2) {  // Speed Run
+      leftMotor.current_batt_voltage = voltage_level();
+      rightMotor.current_batt_voltage = voltage_level();
       generateStepResponse();
       Start = 0;
       // rightMotor.setSpeed(500);
@@ -113,14 +147,18 @@ void loop() {
 
       MotionParameters motionParams;
       MotionParameters motionParams2;
-      motionParams = leftMotor.calculateTrapezoidalProfile(2000, 800, 500);
-      motionParams2 = rightMotor.calculateTrapezoidalProfile(2000, 800, 500);
+      motionParams = leftMotor.calculateTrapezoidalProfile(180, 300, 200);
+      motionParams2 = rightMotor.calculateTrapezoidalProfile(180, 300, 200);
 
       Serial.println("Start");
       leftMotor.resetPID();
       rightMotor.resetPID();
+      leftMotor.current_batt_voltage = voltage_level();
+      rightMotor.current_batt_voltage = voltage_level();
+      double start_left =leftMotor.angle2mm();
+      double start_right =rightMotor.angle2mm(); 
       while ((motionParams.time_step < (motionParams.T)) && Start == 1) {
-        
+
         // while(1){
         // Serial.print("  ");
         // Serial.print(motionParams.prev_time);
@@ -130,10 +168,13 @@ void loop() {
         // Serial.print(motionParams.T);
         // Serial.println("  ");
         leftMotor.followProfile(&motionParams);
-        // rightMotor.followProfile(&motionParams2);
+        rightMotor.followProfile(&motionParams2);
         system();
         OLED_display_stats();
       }
+      
+      SerialBT.println(leftMotor.angle2mm()-start_left);
+      SerialBT.println(rightMotor.angle2mm()-start_right);
       Serial.println("End");
       Start = 0;
 
