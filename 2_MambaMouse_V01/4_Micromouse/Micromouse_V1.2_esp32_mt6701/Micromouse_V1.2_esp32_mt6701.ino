@@ -10,7 +10,7 @@ This is for a cheap but capable maze solving robot (below RM200) with sufficient
 
 Written by Andrew Joseph Ng (AndrewJNg)
 */
-#define PS3_enable 0
+// #define PS3_enable 0
 #define bluetooth_serial_enable 1
 
 // function prototypes
@@ -19,23 +19,16 @@ void loop();
 void system();
 
 int Mode = 1;  // set mode 1 as default
-int Start = false;
+int Start = true;
 
 unsigned long StartTimer = 0;
 
-double KpLeft = 8, KiLeft = 0, KdLeft = 0.02;
-
-int leftWall = 50;
-int rightWall = 50;
-
 // Sensor libraries
 #include <Wire.h>
-// #if bluetooth_serial_enable
 #include "Bluetooth_Serial.h"
-// #endif
+
 #include "Infrared.h"
 #include "MPU6050.h"
-
 #include "Motor_Subsystem.h"
 
 // Advance libraries
@@ -45,26 +38,19 @@ int rightWall = 50;
 #include "User_interface.h"
 #include "OLED.h"
 
-#if PS3_enable
-#include "PS3.h"
-#endif
-
 // #include "FloodFill.h"
 
 void setup() {
 
   Serial.begin(115200);
-  BT_setup();
+  // BT_setup();
   motor_subsystem_setup();
 
-  Gyro_setup();
-  IR_setup();
-  read_memory();
+  // Gyro_setup();
+  // IR_setup();
+  // read_memory();
   OLED_setup();
 
-#if PS3_enable
-  PS3_setup();
-#endif
   // FloodFill_setup();
 }
 
@@ -80,8 +66,8 @@ void loop() {
       // first_Search();
       // Start = false;
 
-      leftMotor.resetPID();
-      rightMotor.resetPID();
+      // leftMotor.resetPID();
+      // rightMotor.resetPID();
       leftMotor.current_batt_voltage = voltage_level();
       rightMotor.current_batt_voltage = voltage_level();
 
@@ -91,35 +77,34 @@ void loop() {
       double curr_distance_right = 0;
 
       while (true) {
-        system();
-        // leftMotor.setSpeed(600);
-        // rightMotor.setSpeed(800);
-        OLED_display_stats();
-        // leftMotor.setMotorVolt(4);
+        // system();
+        // OLED_display_stats();
+        leftMotor.setSpeed(300);
+        // rightMotor.setSpeed(300);
 
-        curr_distance_left = leftMotor.angle2mm();
-        curr_distance_right = rightMotor.angle2mm();
+        // curr_distance_left = leftMotor.angle2mm();
+        // curr_distance_right = rightMotor.angle2mm();
 
-        // Timer variables
+        // // Timer variables
 
-        // Check if 5 seconds have passed
-        if (millis() - previousTargetChange >= 5000) {
+        // // Check if 5 seconds have passed
+        // if (millis() - previousTargetChange >= 5000) {
 
-          previousTargetChange = millis();
+        //   previousTargetChange = millis();
 
-          // Toggle between 0 mm and 1000 mm
-          if (target_pos == 0) {
-            target_pos = 150;
-          } else {
-            target_pos = 0;
-          }
-        }
+        //   // Toggle between 0 mm and 1000 mm
+        //   if (target_pos == 0) {
+        //     target_pos = 150;
+        //   } else {
+        //     target_pos = 0;
+        //   }
+        // }
         // Run position control
-        double Volt_signal_left = leftMotor.PID_Control(target_pos, curr_distance_left);
-        leftMotor.setMotorVolt(Volt_signal_left);
+        // double Volt_signal_left = leftMotor.PD_Control(target_pos, curr_distance_left);
+        // leftMotor.setMotorVolt(Volt_signal_left);
 
-        double Volt_signal_right = rightMotor.PID_Control(target_pos, curr_distance_right);
-        rightMotor.setMotorVolt(Volt_signal_right);
+        // double Volt_signal_right = rightMotor.PD_Control(target_pos, curr_distance_right);
+        // rightMotor.setMotorVolt(Volt_signal_right);
       }
 
 
@@ -128,7 +113,7 @@ void loop() {
     } else if (Mode == 2) {  // Speed Run
       leftMotor.current_batt_voltage = voltage_level();
       rightMotor.current_batt_voltage = voltage_level();
-      generateStepResponse();
+      // generateStepResponse();
       Start = 0;
       // rightMotor.setSpeed(500);
       // align_to_front_wall();
@@ -147,16 +132,16 @@ void loop() {
 
       MotionParameters motionParams;
       MotionParameters motionParams2;
-      motionParams = leftMotor.calculateTrapezoidalProfile(180, 300, 200);
-      motionParams2 = rightMotor.calculateTrapezoidalProfile(180, 300, 200);
+      // motionParams = leftMotor.calculateTrapezoidalProfile(180, 300, 200);
+      // motionParams2 = rightMotor.calculateTrapezoidalProfile(180, 300, 200);
 
       Serial.println("Start");
-      leftMotor.resetPID();
-      rightMotor.resetPID();
+      // leftMotor.resetPID();
+      // rightMotor.resetPID();
       leftMotor.current_batt_voltage = voltage_level();
       rightMotor.current_batt_voltage = voltage_level();
-      double start_left =leftMotor.angle2mm();
-      double start_right =rightMotor.angle2mm(); 
+      double start_left = leftMotor.angle2mm();
+      double start_right = rightMotor.angle2mm();
       while ((motionParams.time_step < (motionParams.T)) && Start == 1) {
 
         // while(1){
@@ -167,14 +152,14 @@ void loop() {
         // Serial.print("  ");
         // Serial.print(motionParams.T);
         // Serial.println("  ");
-        leftMotor.followProfile(&motionParams);
-        rightMotor.followProfile(&motionParams2);
+        // leftMotor.followProfile(&motionParams);
+        // rightMotor.followProfile(&motionParams2);
         system();
         OLED_display_stats();
       }
-      
-      SerialBT.println(leftMotor.angle2mm()-start_left);
-      SerialBT.println(rightMotor.angle2mm()-start_right);
+
+      SerialBT.println(leftMotor.angle2mm() - start_left);
+      SerialBT.println(rightMotor.angle2mm() - start_right);
       Serial.println("End");
       Start = 0;
 
@@ -203,6 +188,7 @@ void loop() {
     } else if (Mode == 4) {
       // PS3 movement
       OLED_display_stats();
+      read_walls();
 
       // int Speed = map(PS3_LeftAnalogStickSpeed(stick_LY), -255, 255, -4000, 4000);
       // int Diff = map(PS3_LeftAnalogStickSpeed(stick_RX), -255, 255, -4000, 4000);
@@ -230,6 +216,6 @@ void loop() {
 
 void system() {
   //system functions, important to keep different time sensitive functions working
-  IR_update();
-  Gyro_update();
+  // IR_update();
+  // Gyro_update();
 }

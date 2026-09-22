@@ -1,20 +1,21 @@
 
 //                         {S1,S2,S5,S6,S3,S4}
+
+//                         {Left_Front,Left_Angled,Left_Side,Right_Side,Right_Angled,Right_Front}
 const byte IREmitPin[6] = { 25, 26, 1, 3, 27, 14 };
 const byte IRRecPin[6] = { 36, 39, 32, 33, 34, 35 };
+double IR_ref_value[6] = { 737, 1228, 1000, 1000, 982, 1105 }; // Calibration value
+
 
 int minIR[6] = { 4095, 4095, 4095, 4095, 4095, 4095 };
 int maxIR[6] = { 0, 0, 0, 0, 0, 0 };
 double IRVal[6] = { 0, 0, 0, 0, 0, 0 };
 double IRDistance[6] = { 0, 0, 0, 0, 0, 0 };
 
-double IR_ref_value[6] = { 819, 1269, 1000, 1000, 1064, 1187 };
-
 
 unsigned long IR_prevMillis = 0;
 
-const int left_Wall_cal = 895;
-const int right_Wall_cal = 1341;
+const int wall_threshold = 102; // 100 is the calibration value point, give it extra 2 to give margine for sensing
 
 
 // function prototypes
@@ -67,6 +68,23 @@ void IR_update() {
   }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void read_walls()
+{
+   IR_update();
+   SerialBT.print(" Left_Front:");
+   SerialBT.print(IRDistance[0]);
+   SerialBT.print(" Left_angled:");
+   SerialBT.print(IRDistance[1]);
+   SerialBT.print(" Right_angled:");
+   SerialBT.print(IRDistance[4]);
+   SerialBT.print(" Right_Front:");
+   SerialBT.print(IRDistance[5]);
+   SerialBT.print(" ");
+   SerialBT.println();
+
+}
+
 
 void calibration() {
 

@@ -1,7 +1,8 @@
 import serial
 import csv
 
-ser = serial.Serial("COM5", 115200)
+ser = serial.Serial("COM4", 115200)
+# ser = serial.Serial("COM3", 115200)
 
 filename = "serial_data2.csv"
 

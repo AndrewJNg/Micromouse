@@ -391,16 +391,16 @@ void OLED_display_stats() {
     // OLED.print(" R: ");
     // OLED.println(rightMotor.updateEncoder());
 
-    // OLED.print("L: ");
-    // OLED.print(leftMotor.measured_velocity);
-    // OLED.print(" R: ");
-    // OLED.println(rightMotor.measured_velocity);
-
-
     OLED.print("L: ");
-    OLED.print(leftMotor.angle2mm());
+    OLED.print(leftMotor.measured_velocity);
     OLED.print(" R: ");
-    OLED.println(rightMotor.angle2mm());
+    OLED.println(rightMotor.measured_velocity);
+
+
+    // OLED.print("L: ");
+    // OLED.print(leftMotor.angle2mm());
+    // OLED.print(" R: ");
+    // OLED.println(rightMotor.angle2mm());
 
     /*
      
