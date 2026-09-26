@@ -75,7 +75,7 @@ void loop() {
       static unsigned long previousTargetChange = 0;
       double curr_distance_left = 0;
       double curr_distance_right = 0;
-
+        leftMotor.resetSpeedController();
       while (true) {
         // system();
         // OLED_display_stats();

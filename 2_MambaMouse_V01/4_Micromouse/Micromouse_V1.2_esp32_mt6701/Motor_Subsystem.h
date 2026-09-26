@@ -103,14 +103,16 @@ private:
   }
 
   // PD feedback
-  double PD_Control(double target_pos = 0, double current_pos = 0) {
+  double PD_Control(double target_pos = 0, double current_pos = 0, double dt=0.005) {
     double fwd_error = target_pos - current_pos;
-    double diff = (fwd_error - PD_previous_fwd_error);
-    PD_previous_fwd_error = fwd_error;
+    double error_derivative = (fwd_error - PD_previous_fwd_error) / (dt*1000*1000);
+    // double diff = (fwd_error - PD_previous_fwd_error);
+    // PD_previous_fwd_error = fwd_error;
 
-    double speed_PID_response = PD_Kp * fwd_error + PD_Kd * diff;
+    // double speed_PID_response = PD_Kp * fwd_error + PD_Kd * diff;
 
-    return speed_PID_response;
+    // return speed_PID_response;
+    return PD_Kp * fwd_error + PD_Kd * error_derivative;
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +188,7 @@ public:
   void setPDGains(double Kp, double Kd) {
     PD_Kp = Kp;
     PD_Kd = Kd;
-    PD_Kd = PD_Kd * motor_update_freq;
+    // PD_Kd = PD_Kd * motor_update_freq;
   }
 
 
@@ -196,12 +198,11 @@ public:
     // obtain speed from encoder
     unsigned long currentMillis = millis();
     if ((currentMillis - prevMillis) >= motor_update_interval) {
-      double curr_distance = angle2mm(); 
+      double curr_distance = angle2mm();
       currentMillis = millis();
 
       ////////////////////////// distance (mm) /////////////////////////////////////
       double time_elapsed = (currentMillis - prevMillis) / 1000.0;  // Convert ms to seconds
-      // double measured_distance_change = (curr_distance - prev_distance);
       measured_velocity = (curr_distance - prev_distance) / time_elapsed;  // mm/s
 
       prevMillis = currentMillis;
@@ -212,7 +213,7 @@ public:
       Volt_signal += feedForward_Control(target_velocity);
 
       target_pos += target_velocity * time_elapsed;
-      // Volt_signal += PD_Control(target_pos, curr_distance);
+      Volt_signal += PD_Control(target_pos, curr_distance, time_elapsed);
 
       // // Print out debug velocities
       Serial.print(" ");
@@ -224,9 +225,16 @@ public:
       // Serial.print(measured_velocity);
       Serial.print(curr_distance);
       Serial.print(" ");
+      // Serial.print(target_pos);
+      // Serial.print(" ");
+      // Serial.print(curr_distance);
+      // Serial.print(" ");
+      // Serial.print(PD_Control(target_pos, curr_distance, time_elapsed));
+      // Serial.print(" ");
       Serial.print(Volt_signal);
+      Serial.print(" ");
       Serial.println();
-      
+
       // // // Print out debug velocities
       // SerialBT.print(" ");
       // SerialBT.print(currentMillis);
@@ -249,6 +257,17 @@ public:
   //   // PD_previous_fwd_error = 0;
   //   target_pos = angle2mm();
   // }
+  void resetSpeedController() {
+    double current_pos = angle2mm();
+
+    target_pos = current_pos;
+    prev_distance = current_pos;
+
+    PD_previous_fwd_error = 0;
+    prev_FF_velocity = 0;
+
+    measured_velocity = 0;
+}
 };
 
 //////////////////////////////////////////////// Velocity profile //////////////////////////////////////////////////////////////////
@@ -455,16 +474,10 @@ MotorControl rightMotor(
 );
 
 
-const float FWD_KM = 52.0;   // mm/s/V
-const float FWD_TM = 0.105;  // forward time constant (in seconds)
-const float FWD_TD = 6 * FWD_TM;
-// const float FWD_TM = 0.020;  // forward time constant (in seconds)
-// const float FWD_TD = 6*FWD_TM;
+const float FWD_KM = 72.0;  // mm/s/V
+const float FWD_TM = 200;  // forward time constant (in ms)
+const float FWD_TD = 2 * FWD_TM;
 
-
-// const float FWD_TM = 0.07;  // forward time constant
-// const float ROT_KM = 775.0;  // deg/s/Volt
-// const float ROT_TM = 0.210;  // rotation time constant
 
 // forward motion controller constants
 // const float FWD_ZETA = 1.0;
@@ -538,7 +551,8 @@ void motor_subsystem_setup() {
                                 (FWD_TM / FWD_KM));  //FF_K_accel
 
 
-  leftMotor.setPDGains(16 * FWD_TM / (FWD_KM * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD), motor_update_freq * (8 * FWD_TM - FWD_TD) / (FWD_KM * FWD_TD));
+  leftMotor.setPDGains( 16 * FWD_TM / (FWD_KM * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD), 
+                        motor_update_freq * (8 * FWD_TM - FWD_TD) / (FWD_KM * FWD_TD));
 
 
   // leftMotor.setPDGains(16 * FWD_TM / (FWD_KM * FWD_ZETA * FWD_ZETA * FWD_TD * FWD_TD,                   //PD_Kp
